@@ -9,6 +9,7 @@ t/00.load.t
 t/00.versions.t
 t/10.interface.t
 t/11.filters.t
+t/12.default.t
 t/20.perl.t
 t/21.html.t
 t/pod-coverage.t
