@@ -59,13 +59,24 @@ bar bar bar
 
 <p>para</p>
 </body></html>
+===
+=begin filter options a b c
+
+The options are:
+
+=end
+---
+<html><body bgcolor="#ffffff">
+<p>[The options are:]<a b c></p>
+</body></html>
 TESTS
 
 plan tests => scalar @tests;
 
 # add a new language
 Pod::POM::View::HTML::Filter->add(
-    foo  => sub { my $s = shift; $s =~ s/foo/bar/g; $s },
+    foo     => sub { my $s = shift; $s =~ s/foo/bar/g; $s },
+    options => sub { "[$_[0]]<$_[1]>" },
 );
 
 my $parser = Pod::POM->new;
