@@ -13,7 +13,6 @@ my $builder = Module::Build->new(
     recommends         => { 'Perl::Tidy' => '20031021', },
     license            => 'perl',
     add_to_cleanup     => ['Pod-POM-View-HTML-Filter-*'],
-    create_makefile_pl => 'traditional',
 );
 
 $builder->create_build_script();
