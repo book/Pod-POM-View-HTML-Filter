@@ -59,7 +59,7 @@ sub view_for {
     if ( $format =~ /^filter\b/ ) {
         my $lang = (split '=', $format)[1];
         if( exists $filter{$lang} ) {
-            return $filter{$lang}->( $for->text );
+            return $filter{$lang}->( $for->text ) . "\n\n";
         }
         else { warn "$lang not supported in =for filter"; }
     }
@@ -82,7 +82,7 @@ sub view_begin {
             pop @{$self->{FILTER}};
             return $output;
         }
-        else { warn "$lang not supported in =for filter"; }
+        else { warn "$lang not supported in =begin filter"; }
     }
     # fall-through
     return '';
@@ -121,9 +121,9 @@ sub perl_filter {
         stderr      => '-',
         errorfile   => '-',
     );
-    $output =~ s!\A<pre>!!;     # Perl::Tidy adds <pre></pre> tags
-    $output =~ s!\n*</pre>\Z!!;
-    $output =~ s/^/$ws/gm;      # put the indentation back
+    $output =~ s!\A<pre>\n?!!;    # Perl::Tidy adds "<pre>\n"
+    $output =~ s!\n</pre>\n\z!!m; #             and "\n</pre>\n"
+    $output =~ s/^/$ws/gm;        # put the indentation back
 
     return $output;
 }
