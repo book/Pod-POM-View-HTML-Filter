@@ -59,7 +59,7 @@ sub view_for {
     if ( $format =~ /^filter\b/ ) {
         my $lang = (split '=', $format)[1];
         if( exists $filter{$lang} ) {
-            return $filter{$lang}->( $for->text ) . "\n\n";
+            return $filter{$lang}->( $for->text, "" ) . "\n\n";
         }
         else { warn "$lang not supported in =for filter"; }
     }
@@ -69,15 +69,15 @@ sub view_for {
 
 sub view_begin {
     my ($self, $begin)  = @_;
-    my ($format, @args) = split ' ', $begin->format();
+    my ($format, $args) = split(' ', $begin->format(), 2);
 
     if ( $format eq 'html' ) {
         return $self->SUPER::view_begin( $begin );
     }
     elsif( $format eq 'filter' ) {
-        my $lang = shift @args;
+        my ($lang, $opts) = split(' ', $args, 2);
         if( exists $filter{$lang} ) {
-            push @{$self->{FILTER}}, $lang;
+            push @{$self->{FILTER}}, [ $lang, $opts ];
             my $output = $begin->content->present($self);
             pop @{$self->{FILTER}};
             return $output;
@@ -91,7 +91,8 @@ sub view_begin {
 sub view_textblock {
     my ($self, $text) = @_;
     if( $self->{FILTER}[-1] ) {
-        $text = $filter{$self->{FILTER}[-1]}->($text);
+        $text = $filter{$self->{FILTER}[-1][0]}->($text,
+                                                  $self->{FILTER}[-1][1]);
     }
     return "<p>$text</p>\n";
 }
@@ -100,7 +101,8 @@ sub view_verbatim {
     my ($self, $text) = @_;
     
     if( $self->{FILTER}[-1] ) {
-        $text = $filter{$self->{FILTER}[-1]}->($text);
+        $text = $filter{$self->{FILTER}[-1][0]}->($text,
+                                                  $self->{FILTER}[-1][1]);
     }
     else { # default
         return $self->SUPER::view_verbatim( $text );
@@ -110,14 +112,15 @@ sub view_verbatim {
 
 # perl highlighting, thanks to Perl::Tidy
 sub perl_filter {
-    my ($code, $output) = ( shift, "" );
+    my ($code, $opts) = ( shift, shift || "" );
+    my $output = "";
     my ($ws) = $code =~ /^(\s*)/; # count the blanks on the first line
     $code =~ s/^$ws//gm;          # remove them
 
     Perl::Tidy::perltidy(
         source      => \$code,
         destination => \$output,
-        argv        => '-html -pre -nopod2html',
+        argv        => "-html -pre -nopod2html " . $opts,
         stderr      => '-',
         errorfile   => '-',
     );
@@ -265,6 +268,10 @@ They are all functions named I<lang>_filter.
 This filter does Perl syntax highlighting with a lot of help from
 Perl::Tidy.
 
+It accepts options to Perl::Tidy, such as C<-nnn> to number lines of
+code. Check Perl::Tidy's documentation for more information about
+those options.
+
 =back
 
 =head1 DEFAULT CSS STYLES
@@ -300,6 +307,35 @@ Here are the styles used by Perl::Tidy:
 
 You can use your own style names, but extending Perl::Tidy's scheme will
 ensure that all your syntax-highlighted sections have a consistent look.
+
+=head1 WRITING YOUR OWN FILTERS
+
+Write a filter is quite easy: a filter is a subroutine that takes two
+arguments (text to parse and option string) and returns the filtered
+string.
+
+The filter is then added to Pod::POM::View::HTML::Filter with the
+add() method:
+
+    $view->add( \&foo_filter );
+
+When presenting the following piece of pod,
+
+    =begin filter foo bar baz
+
+    Some text to filter.
+
+    =end filter
+
+the foo_filter() routine will be called with two arguments, like this:
+
+    foo_filter( "Some text to filter.", "bar baz" );
+
+If you have a complex set of options, your routine will have to parse 
+the option string itself.
+
+Please note that when called in a C<=for> construct, no option string
+is passed to the filter.
 
 =head1 AUTHOR
 
