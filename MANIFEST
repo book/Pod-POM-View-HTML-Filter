@@ -2,10 +2,11 @@ Build.PL
 Changes
 lib/Pod/POM/View/HTML/Filter.pm
 Makefile.PL
-MANIFEST
-META.yml			# Will be created by "make dist"
+MANIFEST			This list of files
+META.yml
 README
 t/00.load.t
+t/00.versions.t
 t/10.interface.t
 t/11.filters.t
 t/20.perl.t
