@@ -90,7 +90,7 @@ sub view_for {
     if ( $format =~ /^filter\b/ ) {
         my $lang = (split '=', $format)[1];
         $lang = exists $filter{$lang} ? $lang : 'default';
-        return $filter{$lang}{code}->( $for->text, "" ) . "(for)\n\n";
+        return $filter{$lang}{code}->( $for->text, "" ) . "\n\n";
     }
     # fall-through
     return '';
