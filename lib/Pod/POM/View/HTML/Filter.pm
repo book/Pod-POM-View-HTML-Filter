@@ -450,8 +450,8 @@ of text, that is passed to the filter. Text paragraphs can contain
 POD escape sequences, such as C<BE<lt>...E<gt>>.
 
 These escape sequences are processed B<before> the paragraph is passed
-through the filter stack. A C<=for> block always contains a text block,
-not a verbatim block, even if it starts with whitespace.
+through the filter stack. A C<=for> block always contains a single text
+block, not a verbatim block, even if it starts with whitespace.
 
 This means that the following block:
 
@@ -582,6 +582,13 @@ Which produces the rather unreadable piece of HTML:
 
 =head2 Caveats
 
+There are a few things to keep in mind when mixing verbatim and text paragraphs
+in a C<=begin> block.
+
+=over 4
+
+=item Text paragraphs are processed for POD escapes
+
 Since a text paragraph is preprocessed for POD escape sequences, the
 following block
 
@@ -625,6 +632,47 @@ will produce:
 =end html
 
 Not quite the same, isn't it?
+
+=item Separate paragraphs are filtered separately
+
+As seen in L<A note on verbatim and text blocks>, the filter processes
+each verbatim and text paragraph independently. So, if you have a filter
+that replace each C<*> character with an auto-incremented number in
+square brackets, like this:
+
+    $view->add(
+        notes => {
+            code => sub {
+                my ( $text, $opt ) = @_;
+                my $n = $opt =~ /(\d+)/ ? $1 : 1;
+                $text =~ s/\*/'[' . $n++ . ']'/ge;
+                $text;
+              }
+        }
+    );
+
+And you try to process the following block:
+
+    =begin filter notes 2
+    
+    TIMTOWDI*, but your library should DWIM* when possible.
+    
+    You can't always claims that PICNIC*, can you?
+    
+    =end filter
+
+Don't be surprised when you read the result:
+
+    <p>TIMTOWDI[2], but your library should DWIM[3] when possible.</p>
+    <p>You can't always claims that PICNIC[2], can you?</p>
+
+The filter was actually called twice, starting at C<2>, just like requested.
+
+Future versions of Pod::POM::View::HTML::Filter I<may> support
+C<init>, C<begin> and C<end> callbacks to run filter initialisation and
+clean up code.
+
+=back
 
 =head1 METHODS
 
@@ -795,10 +843,15 @@ the C<foo_filter()> routine will be called with two arguments, like this:
     foo_filter( "Some text to filter.", "bar baz" );
 
 If you have a complex set of options, your routine will have to parse 
-the option string itself.
+the option string by itself.
 
 Please note that in a C<=for> construct, whitespace in the option string
-must be replaced with colons.
+must be replaced with colons:
+
+    =for filter=foo:bar:baz Some text to filter.
+
+The C<foo_filter()> routine will be called with the same two arguments
+as before.
 
 =head1 BUILT-IN FILTERS CSS STYLES
 
@@ -866,7 +919,7 @@ The goal behind this module was to produce nice looking HTML pages from the
 articles the French Perl Mongers are writing for the French magazine
 GNU/Linux Magazine France (L<http://www.linuxmag-france.org/>).
 
-The resulting web pages are available at
+The resulting web pages can be seen at
 L<http://articles.mongueurs.net/magazines/>.
 
 =head1 AUTHOR
