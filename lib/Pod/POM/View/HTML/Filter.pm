@@ -121,7 +121,7 @@ sub view_begin {
         return $self->SUPER::view_begin( $begin );
     }
     elsif( $format eq 'filter' ) {
-        my @filters = split /\|/, $args;
+        my @filters = map { s/^\s*|\s*$//g; $_ } split /\|/, $args;
 
         # fetch the text and verbatim blocks in the begin section
         # and remember the type of each block
@@ -476,7 +476,7 @@ will produce this:
 
 .h-lno  { color: #aaaaaa; background: #f7f7f7;}   /* line numbers         */
 -->
-</script>
+</style>
 
     <pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>foo<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
 
@@ -571,23 +571,24 @@ view for your Pod::POM object. Therefore you must use C<new>.
 
 To be used as:
 
-    =begin filter lang options
+    =begin filter lang optionstring
 
-    # some code in language lang
+    # some text to process with filter "lang"
 
     =end filter
 
-The options are passed as a single string to the filter routine which
-must do its own parsing.
+The optionstring is trimed for whitespace and passed as a single string
+to the filter routine which must perform its own parsing.
 
 =item view_for
 
 To be used as:
 
-    =for filter=lang
+    =for filter=lang:option1:option2
     # some code in language lang
 
-The C<=for> construct does not support filter options.
+The option string sent to the filter C<lang> would be C<option1 option2>
+(colons are replaced with spaces).
 
 =back
 
@@ -667,9 +668,11 @@ string.
 The filter is then added to Pod::POM::View::HTML::Filter with the
 add() method:
 
-    $view->add( foo => {
-        code     => \&foo_filter,
-        requires => [],
+    $view->add(
+        foo => {
+            code     => \&foo_filter,
+            requires => [],
+        }
     );
 
 When presenting the following piece of pod,
