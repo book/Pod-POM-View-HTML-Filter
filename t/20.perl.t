@@ -3,7 +3,7 @@ use strict;
 use Pod::POM;
 use Pod::POM::View::HTML::Filter;
 
-plan skip_all => "Perl::Tidy not installed"
+plan skip_all => "Don't know perl"
   unless Pod::POM::View::HTML::Filter->know( 'perl' );
 
 $Pod::POM::DEFAULT_VIEW = Pod::POM::View::HTML::Filter->new;
@@ -86,7 +86,7 @@ my @tests2 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 </body></html>
 TESTS
 
-plan tests => @tests + 2 * @tests2;
+plan tests => @tests + 2 * @tests2 + 2;
 
 my $parser = Pod::POM->new;
 for ( @tests ) {
@@ -103,4 +103,21 @@ for ( @tests2 ) {
     is( "$pom", $_->[1], "Correct output the second time around" );
   }
 }
+
+# a test for Perl::Tidy in conjuction with Get::Long::Configure
+use Getopt::Long;
+Getopt::Long::Configure("bundling");
+
+my $str;
+my $pom = $parser->parse_text("=begin filter perl\n\n    \$A++\n\n=end filter")
+  || diag $parser->error;
+eval { $str = "$pom" };
+
+is( $str, <<'EOH', "Correct output" );
+<html><body bgcolor="#ffffff">
+<pre>    <span class="i">$A</span>++</pre>
+</body></html>
+EOH
+
+is($@, '', "No error when Getopt::Long::Configure called");
 
