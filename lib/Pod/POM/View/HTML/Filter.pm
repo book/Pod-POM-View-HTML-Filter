@@ -1,11 +1,12 @@
 package Pod::POM::View::HTML::Filter;
-use base 'Pod::POM::View::HTML';
+use Pod::POM::View::HTML;
+our @ISA = qw( Pod::POM::View::HTML );
 
 use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %filter;
 my %builtin = (
@@ -21,7 +22,7 @@ my %builtin = (
     },
 );
 
-my $HTML_PROTECT;
+my $HTML_PROTECT = 0;
 
 # automatically register built-in handlers
 my $INIT = 1;
@@ -83,7 +84,7 @@ sub view_for {
         if( exists $filter{$lang} ) {
             return $filter{$lang}{code}->( $for->text, "" ) . "\n\n";
         }
-        else { warn "$lang not supported in =for filter"; }
+        else { carp "$lang not supported in =for filter"; }
     }
     # fall-through
     return '';
@@ -114,7 +115,7 @@ sub view_begin {
             }
             return $output;
         }
-        else { warn "$lang not supported in =begin filter"; }
+        else { carp "$lang not supported in =begin filter"; }
     }
     # fall-through
     return '';
