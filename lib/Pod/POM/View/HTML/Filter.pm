@@ -160,12 +160,13 @@ sub perl_filter {
 }
 
 # HTML highlighting thanks to Syntax::Highlight::HTML
-my $html_filter_parser;
+my %html_filter_parser;
 sub html_filter {
-    my ($code, $opts) = (@_, "");
+    my ($code, $opts) = ( shift, shift || "" );
 
-    $html_filter_parser ||= Syntax::Highlight::HTML->new;
-    return $html_filter_parser->parse( $code )
+    my $parser = $html_filter_parser{$opts}
+      || Syntax::Highlight::HTML->new( map { ( split /=/ ) } split ' ', $opts );
+    return $parser->parse($code);
 }
 
 1;
