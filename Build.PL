@@ -7,7 +7,10 @@ my $builder = Module::Build->new(
     license           => '',
     dist_author       => 'Philippe "BooK" Bruhat <book@cpan.org>',
     dist_version_from => 'lib/Pod/POM/View/HTML/Filter.pm',
-    requires          => { 'Test::More' => 0, },
+    requires          => {
+        'Test::More' => 0,
+        'Pod::POM'   => '0.17'
+    },
     recommends        => { 'Perl::Tidy' => '20031021', },
     license           => 'perl',
     add_to_cleanup    => ['Pod-POM-View-HTML-Filter-*'],
