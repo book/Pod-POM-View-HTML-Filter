@@ -1,5 +1,17 @@
 Revision history for Pod-POM-View-HTML-Filter
 
+0.05 Thu Oct 14 11:44:14 CEST 2004
+        [FEATURES]
+        - support stacking filters by using the | notation
+        [ENHANCEMENTS]
+        - =for blocks now accept filter options
+        - much better processing for the content of the begin section
+        - support for shell colouring with Maddingue's Syntax::Highlight::Shell
+        [DOCUMENTATION]
+        - much more documentation with many examples
+        [FIXES]
+        - removed the pasted code from Pod::POM::View::HTML (see 0.03)
+
 0.04 Tue Tue Oct 12 09:46:17 CEST 2004
         [ENHANCEMENTS]
         - when the filter is not known by PPVHF, simply use the default
