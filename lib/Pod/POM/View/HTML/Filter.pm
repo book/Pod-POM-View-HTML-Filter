@@ -4,7 +4,7 @@ use base 'Pod::POM::View::HTML';
 use warnings;
 use strict;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %filter;
 my %prereq = (
