@@ -12,5 +12,7 @@ t/11filters.t
 t/12default.t
 t/20perl.t
 t/21html.t
+t/distchk.t
 t/pod-coverage.t
 t/pod.t
+t/portfs.t
