@@ -89,12 +89,17 @@ sub view_for {
 
     if ( $format =~ /^filter\b/ ) {
         my $args   = (split '=', $format, 2)[1];
+        return '' unless defined $args; # silently skip
+
         my $output = $for->text;
         my $verbatim;
 
         # stacked filters
         for my $lang (split /\|/, $args) {
+            ( $lang, my $opts ) = ( split( ':', $lang, 2 ), '' );
+            $opts =~ y/:/ /;
             $lang   = exists $filter{$lang} ? $lang : 'default';
+
             $output = $filter{$lang}{code}->( $output, "" );
             $verbatim = $filter{$lang}{verbatim};
         }
@@ -123,7 +128,7 @@ sub view_begin {
         my $prev = '';
         my @blocks;
         for( @{ $begin->content } ) {
-            # FIXME bare text blocks appear sometimes
+            # bare text blocks appear sometimes
             my $type = ref $_ ? $_->type : 'text';
 
             # catenate verbatim blocks together
@@ -133,7 +138,7 @@ sub view_begin {
               $type
             ] if $type eq 'verbatim';
 
-            # quotes force Pod::POM to present the $_ data in html
+            # stringification forces Pod::POM to present the $_ data in html
             push @blocks, [
               (s{\A<p>|</p>[\n\r]*\z}{}g, $_)[1],
               $type
@@ -295,7 +300,201 @@ Please note that even though the module was specifically designed
 for use with Perl::Tidy, you can write your own filters quite
 easily.
 
-=head2 Methods
+=head1 FILTERING POD?
+
+The whole idea of this module is to take advantage of all the syntax
+coloring modules that exist (actually, Perl::Tidy was my first target)
+to produce colorful code examples in a POD document (after conversion
+to HTML).
+
+Filters can be used in two different POD constructs:
+
+=over 4
+
+=item C<=begin filter I<filter>>
+
+The data in the C<=begin filter> ... C<=end filter> region is passed to
+the filter and the result is output in place in the document.
+
+=item C<=for filter=I<filter>>
+
+C<=for> filters work just like C<=begin>/C=<end> filters, except that
+a single paragraph is the target.
+
+=back
+
+=head2 Options
+
+Some filters may accept options that alter their behaviour.
+Options are separated by whitespace, and appear after the name of the
+filter. For example, the following code will be rendered in colour and
+with line numbers:
+
+    =begin filter perl -nnn
+
+        $a = 123;
+        $b = 3;
+        print $a * $b;     # prints 369
+        print $a x $b;     # prints 123123123
+
+    =end filter
+
+C<=for> filters can also accept options, but the syntax is less clear.
+(This is because C<=for> expects the I<formatname> to match C<\S+>.)
+
+The syntax is the following:
+
+    =for filter=html:nnn=1
+         <center><img src="camel.png" />
+         A camel</center>
+
+In summary, options are separated by space for C<=begin> blocks and by
+colons for C<=for> paragraphs.
+
+The options and their paramater depend on the filter, but they cannot contain
+the pipe (C<|>) or colon (C<:>) character, for obvious reasons.
+
+=head2 Pipes
+
+Having filter to modify a block of text is usefule, but what's more useful
+(and fun) than a filter? Answer: a stack of filters piped together!
+
+Take the imaginary filters C<foo> (which does a simple C<s/foo/bar/g>)
+and C<bang> (which does an even simpler C<tr/r/!/>). The following block
+
+    =begin filter foo|bar
+
+    foo bar baz
+
+    =end
+
+will become C<ba! ba! baz>.
+
+And naturally, 
+
+    =for filter=bar|foo
+    foo bar baz
+
+will return C<bar ba! baz>.
+
+=head2 A note on verbatim and text blocks
+
+Verbatim paragraphs are catenated together to form a single block
+of text, that is passed to the filter. Text paragraphs can contain
+POD escape sequences, such as BE<lt>...E<gt>.
+
+These escape sequences are processed B<before> the paragraph is passed
+through the filter stack. A C<=for> block always contains a text block,
+not a paragraph, even if it starts with whitespace.
+
+This means that the following block:
+
+    =begin filter foo
+
+    a paragraph
+
+        verbatim 1
+
+        verbatim 2
+
+    another paragraph
+    somewhat longer
+
+    a third paragraph
+
+        verbatim 3
+
+    =end
+
+will be handled as five separate blocks:
+
+=over 4
+
+=item a text block
+
+C<a paragraph>
+
+=item a three line verbatim block
+
+C<    verbatim 1>, blank line, C<    verbatim 2>
+
+=item a two line long text block
+
+C<another paragraph>, C<somewhat longer>
+
+=item a single line text block 
+
+C<a third paragraph>
+
+=item and a last verbatim block
+
+C<    verbatim 3>
+
+=back
+
+Each block will be filtered independently by the filter stack and the result
+will be catenated together and output in your HTML document.
+
+=head2 Examples and caveats
+
+Since a text paragraph is preprocessed for POD escape sequences, the
+following block
+
+    =begin filter html
+
+    B<foo>
+
+    =end
+
+will produce this:
+
+    <pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>foo<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
+
+=begin html
+
+<p>Which a web browser will render as:</p>
+<style type="text/css">
+<!--
+.h-decl { color: #336699; font-style: italic; }   /* doctype declaration  */
+.h-pi   { color: #336699;                     }   /* process instruction  */
+.h-com  { color: #338833; font-style: italic; }   /* comment              */
+.h-ab   { color: #000000; font-weight: bold;  }   /* angles as tag delim. */
+.h-tag  { color: #993399; font-weight: bold;  }   /* tag name             */
+.h-attr { color: #000000; font-weight: bold;  }   /* attribute name       */
+.h-attv { color: #333399;                     }   /* attribute value      */
+.h-ent  { color: #cc3333;                     }   /* entity               */
+
+.h-lno  { color: #aaaaaa; background: #f7f7f7;}   /* line numbers         */
+-->
+</script>
+
+    <pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>foo<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
+
+=end html
+
+Whereas
+
+    =begin filter html
+    
+        B<foo>
+
+    =end
+
+will produce:
+
+    <pre>    B<span class="h-ab">&lt;</span><span class="h-tag">foo</span><span class="h-ab">&gt;</span></pre>
+
+=begin html
+
+<p>Which a web browser will render as:</p>
+
+    <pre>    B<span class="h-ab">&lt;</span><span class="h-tag">foo</span><span class="h-ab">&gt;</span></pre>
+
+=end html
+
+=head1 METHODS
+
+=head2 Public methods
 
 The following methods are available:
 
@@ -380,18 +579,9 @@ To be used as:
 
 The C<=for> construct does not support filter options.
 
-=item view_textblock
-=item view_verbatim
-
-Since C<=begin>/C<=end> and C<=for> blocks contain C<verbatim> and C<text>,
-only these methods are overloaded.
-
-=item view_seq_text
-
-This method was copied verbatim from Pod::POM::View::HTML.
-This is an ugly hack and should disappear in future releases.
-
 =back
+
+=head1 FILTERS
 
 =head2 Built-in filters
 
@@ -458,7 +648,7 @@ See Syntax::Highlight::Shell for the list of supported options.
 
 =back
 
-=head1 WRITING YOUR OWN FILTERS
+=head2 Writing your own filters
 
 Write a filter is quite easy: a filter is a subroutine that takes two
 arguments (text to parse and option string) and returns the filtered
@@ -554,11 +744,20 @@ Syntax::Highlight::Shell defines the following styles:
 
 Philippe "BooK" Bruhat, C<< <book@cpan.org> >>
 
+=head1 HISTORY
+
+The goal behind this module was to produce nice looking HTML pages from the
+articles the French Perl Mongers are writing for the French magazine
+GNU/Linux Magazine France (L<http://www.linuxmag-france.org/>).
+
+The result are available at L<http://articles.mongueurs.net/magazines/>.
+
 =head1 THANKS
 
 Many thanks to Sébastien Aperghis-Tramoni (Maddingue), who helped
-debugging the module and wrote Syntax::Highlight::HTML so that I
-could ship the C<html> filter.
+debugging the module and wrote Syntax::Highlight::HTML and
+Syntax::Highlight::Shell so that I could ship PPVHF with more than
+one filter.
 
 =head1 BUGS
 
@@ -576,4 +775,3 @@ under the same terms as Perl itself.
 
 =cut
 
-1;
