@@ -12,24 +12,19 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 =for filter=html <b>bold</b>
 ---
 <html><body bgcolor="#ffffff">
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>
-</pre>
-
-
+<pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 ===
 =begin filter html
 
-<!-- now in full colour! -->
-<b>bold</b><i>italics</i>
+<b>escaped</b>
+B<bold>
 
 =end filter
 ---
 <html><body bgcolor="#ffffff">
-<pre>
-<span class="h-com">&lt;!-- now in full colour! --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">i</span><span class="h-ab">&gt;</span>italics<span class="h-ab">&lt;/</span><span class="h-tag">i</span><span class="h-ab">&gt;</span></pre>
+<pre><span class="h-ent">&amp;lt;</span>b<span class="h-ent">&amp;gt;</span>escaped<span class="h-ent">&amp;lt;</span>/b<span class="h-ent">&amp;gt;</span>
+<span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 ===
 =begin filter html
@@ -40,8 +35,7 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 =end filter
 ---
 <html><body bgcolor="#ffffff">
-<pre>
-    <span class="h-com">&lt;!-- now in verbatim --&gt;</span>
+<pre>    <span class="h-com">&lt;!-- now in verbatim --&gt;</span>
     <span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">i</span><span class="h-ab">&gt;</span>italics<span class="h-ab">&lt;/</span><span class="h-tag">i</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 ===
@@ -57,8 +51,7 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 =end filter
 ---
 <html><body bgcolor="#ffffff">
-<pre>
-    <span class="h-com">&lt;!-- a longer piece of HTML --&gt;</span>
+<pre>    <span class="h-com">&lt;!-- a longer piece of HTML --&gt;</span>
     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>First paragraph<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
 
     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>another para<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
@@ -68,25 +61,24 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 ===
 =begin filter html
 
-<p>This is a list:</p>
+    <p>This is a list:</p>
 
-<ul>
-  <li>first item</li>
-  <li>second
-      item</li>
-</ul>
+    <ul>
+      <li>first item</li>
+      <li>second
+          item</li>
+    </ul>
 
 =end filter
 ---
 <html><body bgcolor="#ffffff">
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>This is a list:<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<pre>    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>This is a list:<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
 
-<span class="h-ab">&lt;</span><span class="h-tag">ul</span><span class="h-ab">&gt;</span>
-  <span class="h-ab">&lt;</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>first item<span class="h-ab">&lt;/</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>
-  <span class="h-ab">&lt;</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>second
-      item<span class="h-ab">&lt;/</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">ul</span><span class="h-ab">&gt;</span></pre>
+    <span class="h-ab">&lt;</span><span class="h-tag">ul</span><span class="h-ab">&gt;</span>
+      <span class="h-ab">&lt;</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>first item<span class="h-ab">&lt;/</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>
+      <span class="h-ab">&lt;</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>second
+          item<span class="h-ab">&lt;/</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>
+    <span class="h-ab">&lt;/</span><span class="h-tag">ul</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 TESTS
 
@@ -103,13 +95,10 @@ my @tests2 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 =end filter
 ---
 <html><body bgcolor="#ffffff">
-<pre>
-    <span class="h-com">&lt;!-- a longer piece of HTML --&gt;</span>
-    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>First paragraph<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>another para<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-
-    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>End<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
+<pre>    <span class="h-com">&lt;!-- a longer piece of HTML --&gt;</span>
+    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>First paragraph<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
+<pre><span class="h-ent">&amp;lt;</span>p<span class="h-ent">&amp;gt;</span>another para<span class="h-ent">&amp;lt;</span>/p<span class="h-ent">&amp;gt;</span></pre>
+<pre>    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>End<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 TESTS
 my @tests3 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
@@ -123,11 +112,9 @@ my @tests3 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 =end filter
 ---
 <html><body bgcolor="#ffffff">
-<pre>
-<span class="h-lno">  1</span> <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 1<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-lno">  2</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 2<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-lno">  3</span> 
-<span class="h-lno">  4</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
+<pre><span class="h-lno">  1</span> <span class="h-ent">&amp;lt;</span>p<span class="h-ent">&amp;gt;</span>line 1<span class="h-ent">&amp;lt;</span>/p<span class="h-ent">&amp;gt;</span>
+<span class="h-lno">  2</span>     <span class="h-ent">&amp;lt;</span>p<span class="h-ent">&amp;gt;</span>line 2<span class="h-ent">&amp;lt;</span>/p<span class="h-ent">&amp;gt;</span></pre>
+<pre><span class="h-lno">  1</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 TESTS
 
