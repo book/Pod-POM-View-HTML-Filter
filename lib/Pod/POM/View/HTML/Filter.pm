@@ -1,4 +1,4 @@
-package Pod::POM::View::HTML::Syntax;
+package Pod::POM::View::HTML::Filter;
 use base 'Pod::POM::View::HTML';
 
 use warnings;
@@ -6,7 +6,7 @@ use strict;
 
 our $VERSION = '0.01';
 
-my %syntax;
+my %filter;
 my %prereq = (
     perl => [ qw( Perl::Tidy ) ],
 );
@@ -19,23 +19,34 @@ for my $lang ( keys %prereq ) {
         $nok++ if $@;
     }
     no strict 'refs';
-    $syntax{$lang} = \&{"${lang}_syntax"} unless $nok;
+    $filter{$lang} = \&{"${lang}_filter"} unless $nok;
 }
 
 #
 # Specific methods
 #
+sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new(@_)
+        || return;
+
+    # initalise stack for maintaining info for filters
+    $self->{ FILTER } = [];
+
+    return $self;
+}
+
 sub add {
     my ($class, %args) = @_;
-    $syntax{$_} = $args{$_} for keys %args;
+    $filter{$_} = $args{$_} for keys %args;
 }
 
 sub know {
     my ($class, $lang) = @_;
-    return exists $syntax{$lang};
+    return exists $filter{$lang};
 }
 
-sub langs { keys %syntax; }
+sub langs { keys %filter; }
 
 #
 # overridden Pod::POM::View::HTML methods
@@ -45,11 +56,12 @@ sub view_for {
     my $format = $for->format;
 
     return $for->text() . "\n\n" if $format =~ /\bhtml\b/;
-    if ( $format =~ /^syntax\b/ ) {
+    if ( $format =~ /^filter\b/ ) {
         my $lang = (split '=', $format)[1];
-        return $syntax{$lang}->( $for->text )
-          if exists $syntax{$lang};
-        warn "$lang not supported in =for syntax";
+        if( exists $filter{$lang} ) {
+            return $filter{$lang}->( $for->text );
+        }
+        else { warn "$lang not supported in =for filter"; }
     }
     # fall-through
     return '';
@@ -62,17 +74,42 @@ sub view_begin {
     if ( $format eq 'html' ) {
         return $self->SUPER::view_begin( $begin );
     }
-    elsif( $format eq 'syntax' ) {
+    elsif( $format eq 'filter' ) {
         my $lang = shift @args;
-        return $syntax{$lang}->( join('', $begin->content) )
-          if exists $syntax{$lang};
+        if( exists $filter{$lang} ) {
+            push @{$self->{FILTER}}, $lang;
+            my $output = $begin->content->present($self);
+            pop @{$self->{FILTER}};
+            return $output;
+        }
+        else { warn "$lang not supported in =for filter"; }
     }
     # fall-through
     return '';
 }
 
+sub view_textblock {
+    my ($self, $text) = @_;
+    if( $self->{FILTER}[-1] ) {
+        $text = $filter{$self->{FILTER}[-1]}->($text);
+    }
+    return "<p>$text</p>\n";
+}
+
+sub view_verbatim {
+    my ($self, $text) = @_;
+    
+    if( $self->{FILTER}[-1] ) {
+        $text = $filter{$self->{FILTER}[-1]}->($text);
+    }
+    else { # default
+        return $self->SUPER::view_verbatim( $text );
+    }
+    return "<pre>$text</pre>\n\n";
+}
+
 # perl highlighting, thanks to Perl::Tidy
-sub perl_syntax {
+sub perl_filter {
     my ($code, $output) = ( shift, "" );
     my ($ws) = $code =~ /^(\s*)/; # count the blanks on the first line
     $code =~ s/^$ws//gm;          # remove them
@@ -84,7 +121,10 @@ sub perl_syntax {
         stderr      => '-',
         errorfile   => '-',
     );
-    $output =~ s/^/$ws/gm;        # put the indentation back
+    $output =~ s!\A<pre>!!;     # Perl::Tidy adds <pre></pre> tags
+    $output =~ s!\n*</pre>\Z!!;
+    $output =~ s/^/$ws/gm;      # put the indentation back
+
     return $output;
 }
 
@@ -94,26 +134,42 @@ __END__
 
 =head1 NAME
 
-Pod::POM::View::HTML::Syntax - Add syntax highlighting to your pod documents
+Pod::POM::View::HTML::Filter - Use filters on sections of your pod documents
 
 =cut
 
 =head1 SYNOPSIS
 
-    =begin syntax perl
+    =begin filter perl
 
         # now in full colour!
         $A++;
 
-    =end syntax
+    =end filter
 
-    =for syntax=perl $A++; # this works too
+    =for filter=perl $A++; # this works too
 
 =head1 DESCRIPTION
 
 This module is a subclass of Pod::POM::View::HTML that support the
-C<syntax> extension. This can be used in C<=begin> / C<=end> and
+C<filter> extension. This can be used in C<=begin> / C<=end> and
 C<=for> pod blocks.
+
+Please note that since the view maintains an internal state, only
+an instance of the view can be used to present the POM object.
+Either use:
+
+    my $view = Pod::POM::View::HTML::Filter->new;
+    $pom->present( $view );
+
+or
+
+    $Pod::POM::DEFAULT_VIEW = Pod::POM::View::HTML::Filter->new;
+    $pom->present;
+
+Please note that even though the module was specifically designed
+for use with Perl::Tidy, you can write your own filters quite
+easily.
 
 =head2 Methods
 
@@ -144,7 +200,7 @@ Return true if the view knows how to handle language C<$lang>.
 =head2 Overridden methods
 
 The following Pod::POM::View::HTML methods are overridden in
-Pod::POM::View::HTML::Syntax:
+Pod::POM::View::HTML::Filter:
 
 =over 4
 
@@ -152,18 +208,18 @@ Pod::POM::View::HTML::Syntax:
 
 To be used as:
 
-    =for syntax lang
+    =for filter=lang
     # some code in language lang
 
 =item view_begin
 
 To be used as:
 
-    =begin syntax lang
+    =begin filter lang
 
     # some code in language lang
 
-    =end syntax
+    =end filter
 
 =back
 
@@ -199,7 +255,7 @@ Here are the styles used by Perl::Tidy:
     pd      pod-text
 
 You can use your own style names, but extending Perl::Tidy's scheme will
-ensure that all your syntax-highlighted section have a consistent look.
+ensure that all your syntax-highlighted sections have a consistent look.
 
 =head1 AUTHOR
 
@@ -208,7 +264,7 @@ Philippe "BooK" Bruhat, C<< <book@cpan.org> >>
 =head1 Bugs
 
 Please report any bugs or feature requests to
-C<bug-pod-pom-view-html-syntax@rt.cpan.org>, or through the web interface at
+C<bug-pod-pom-view-html-filter@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
 be notified of progress on your bug as I make changes.
 
