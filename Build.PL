@@ -10,7 +10,10 @@ my $builder = Module::Build->new(
         'Test::More' => 0,
         'Pod::POM'   => '0.17'
     },
-    recommends         => { 'Perl::Tidy' => '20031021', },
+    recommends         => {
+        'Perl::Tidy'              => '20031021',
+        'Syntax::Highlight::HTML' => 0,
+    },
     license            => 'perl',
     add_to_cleanup     => ['Pod-POM-View-HTML-Filter-*'],
 );
