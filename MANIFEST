@@ -1,10 +1,12 @@
 Build.PL
 Changes
-MANIFEST
-META.yml # Will be created by "make dist"
+lib/Pod/POM/View/HTML/Filter.pm
 Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
 README
-lib/Pod/POM/View/HTML/Syntax.pm
 t/00.load.t
+t/10.interface.t
+t/20.perl.t
 t/pod-coverage.t
 t/pod.t
