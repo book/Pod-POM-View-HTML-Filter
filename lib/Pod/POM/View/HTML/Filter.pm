@@ -88,10 +88,22 @@ sub view_for {
     return $for->text() . "\n\n" if $format =~ /^html\b/;
 
     if ( $format =~ /^filter\b/ ) {
-        my $lang = (split '=', $format)[1];
-        $lang = exists $filter{$lang} ? $lang : 'default';
-        return $filter{$lang}{code}->( $for->text, "" ) . "\n\n";
+        my $args   = (split '=', $format, 2)[1];
+        my $output = $for->text;
+        my $verbatim;
+
+        # stacked filters
+        for my $lang (split /\|/, $args) {
+            $lang   = exists $filter{$lang} ? $lang : 'default';
+            $output = $filter{$lang}{code}->( $output, "" );
+            $verbatim = $filter{$lang}{verbatim};
+        }
+        return sprintf(
+            ( $verbatim ? "<pre>%s</pre>\n" : "%s\n\n" ),
+            $output
+        );
     }
+
     # fall-through
     return '';
 }
@@ -184,7 +196,7 @@ sub perl_filter {
     # put back Getopt::Long previous configuration, if needed
     Getopt::Long::Configure( $glc );
 
-    return "<pre>$output</pre>\n";
+    return $output;
 }
 
 # a cache for multiple parsers with the same options
@@ -196,7 +208,9 @@ sub html_filter {
 
     my $parser = $filter_parser{html}{$opts}
       ||= Syntax::Highlight::HTML->new( map { (split /=/) } split ' ', $opts );
-    return $parser->parse($code);
+    my $output = $parser->parse($code);
+    $output =~ s!\A<pre>|</pre>\z!!, ;
+    return $output;
 }
 
 # Shell highlighting thanks to Syntax::Highlight::Shell
@@ -205,7 +219,9 @@ sub shell_filter {
 
     my $parser = $filter_parser{shell}{$opts}
       ||= Syntax::Highlight::Shell->new( map { (split /=/) } split ' ', $opts );
-    return $parser->parse($code);
+    my $output = $parser->parse($code);
+    $output =~ s!\A<pre>|</pre>\z!!, ;
+    return $output;
 }
 
 1;
