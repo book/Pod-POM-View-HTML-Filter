@@ -29,8 +29,7 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 <html><body bgcolor="#ffffff">
 <pre>
 <span class="h-com">&lt;!-- now in full colour! --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">i</span><span class="h-ab">&gt;</span>italics<span class="h-ab">&lt;/</span><span class="h-tag">i</span><span class="h-ab">&gt;</span>
-</pre>
+<span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">i</span><span class="h-ab">&gt;</span>italics<span class="h-ab">&lt;/</span><span class="h-tag">i</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 ===
 =begin filter html
@@ -43,8 +42,7 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 <html><body bgcolor="#ffffff">
 <pre>
     <span class="h-com">&lt;!-- now in verbatim --&gt;</span>
-    <span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">i</span><span class="h-ab">&gt;</span>italics<span class="h-ab">&lt;/</span><span class="h-tag">i</span><span class="h-ab">&gt;</span>
-</pre>
+    <span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">i</span><span class="h-ab">&gt;</span>italics<span class="h-ab">&lt;/</span><span class="h-tag">i</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 ===
 =begin filter html
@@ -65,8 +63,7 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 
     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>another para<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
 
-    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>End<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-</pre>
+    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>End<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 ===
 =begin filter html
@@ -89,8 +86,7 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
   <span class="h-ab">&lt;</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>first item<span class="h-ab">&lt;/</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>
   <span class="h-ab">&lt;</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>second
       item<span class="h-ab">&lt;/</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">ul</span><span class="h-ab">&gt;</span>
-</pre>
+<span class="h-ab">&lt;/</span><span class="h-tag">ul</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 ===
 =begin filter html nnn=1
@@ -107,8 +103,7 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
   1: <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 1<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
   2:     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 2<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
   3: 
-  4:     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-</pre>
+  4:     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 TESTS
 
