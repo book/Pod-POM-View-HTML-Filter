@@ -7,13 +7,15 @@ use strict;
 use Carp;
 
 our $VERSION = '0.04';
+our $default = {
+        code     => sub { '<pre>' . $_[0] . '</pre>' },
+                verbatim => 1,
+                    };
+
 
 my %filter;
 my %builtin = (
-    default => {
-        code     => sub { '<pre>' . $_[0] . '</pre>' },
-        verbatim => 1,
-    },
+    default => $default,
     perl => {
         code     => \&perl_filter,
         requires => [qw( Perl::Tidy )],
@@ -409,6 +411,21 @@ Pod::POM::View::HTML::Filter is shipped with a few built-in filters.
 They are all functions named I<lang>_filter.
 
 =over 4
+
+=item default
+
+This filter is called when the required filter is not known by
+Pod::POM::View::HTML::Filter. It simply wraps the content of the 
+=begin / =end section between C<< <pre> >>/C<< </pre> >>.
+
+The default filter is available from
+C<$Pod::POM::View::HTML::Filter::default>. This allows one to do:
+
+    Pod::POM::View::HTML::Filter->add(
+        $_ => $Pod::POM::View::HTML::Filter::default
+    ) for Pod::POM::View::HTML::Filter->filters;
+
+and set all existing filters back to default.
 
 =item perl_filter
 
