@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 6;
 use strict;
 use Pod::POM;
 use Pod::POM::View::HTML::Filter;
@@ -12,6 +12,8 @@ ok( ! $view->know( 'foo' ), "Don't know foo" );
 
 # test some foo filter anyway
 my $parser = Pod::POM->new;
+
+# test verbatim text
 my $pom = $parser->parse_text( <<'EOT' ) || diag $parser->error;
 =head1 Foo
 
@@ -23,16 +25,37 @@ The foo filter at work:
 
 =end filter
 EOT
-is( "$pom", << 'EOH', "Default is simply <pre>");
+is( "$pom", << 'EOH', "Default is simply naught (<pre>)");
 <html><body bgcolor="#ffffff">
 <h1>Foo</h1>
 
 <p>The foo filter at work:</p>
-<pre>    $A++;</pre></body></html>
+<pre>    $A++;</pre>
+</body></html>
+EOH
+
+# test normal text
+$pom = $parser->parse_text( <<'EOT' ) || diag $parser->error;
+=head1 Foo
+
+The foo filter at work:
+
+=begin filter foo
+
+$A++;
+
+=end filter
+EOT
+is( "$pom", << 'EOH', "Default is simply naught (<p>)");
+<html><body bgcolor="#ffffff">
+<h1>Foo</h1>
+
+<p>The foo filter at work:</p>
+<p>$A++;</p>
+</body></html>
 EOH
 
 # test $Pod::POM::View::HTML::Filter::default
-
 # add a foo filter
 Pod::POM::View::HTML::Filter->add(
     foo  => { code => sub { my $s = shift; $s =~ s/foo/bar/g; $s } },
@@ -72,7 +95,8 @@ EOT
 
 is( "$pom", <<'EOH', "Correct output" );
 <html><body bgcolor="#ffffff">
-<pre>bar foo bar
-baz</pre></body></html>
+<p>bar foo bar
+baz</p>
+</body></html>
 EOH
 
