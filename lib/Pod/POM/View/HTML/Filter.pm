@@ -410,23 +410,33 @@ will be handled as five separate blocks:
 
 =over 4
 
-=item a text block
+=item *
+
+a text block
 
 C<a paragraph>
 
-=item a three line verbatim block
+=item *
+
+a three line verbatim block
 
 C<    verbatim 1>, blank line, C<    verbatim 2>
 
-=item a two line long text block
+=item *
+
+a two line long text block
 
 C<another paragraph>, C<somewhat longer>
 
-=item a single line text block 
+=item *
+
+a single line text block 
 
 C<a third paragraph>
 
-=item and a last verbatim block
+=item *
+
+and a last verbatim block
 
 C<    verbatim 3>
 
