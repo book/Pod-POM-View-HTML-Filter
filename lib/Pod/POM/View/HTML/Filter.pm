@@ -10,14 +10,18 @@ our $VERSION = '0.04';
 
 my %filter;
 my %builtin = (
+    default => {
+        code     => sub { '<pre>' . $_[0] . '</pre>' },
+        verbatim => 1,
+    },
     perl => {
         code     => \&perl_filter,
-        requires => [ qw( Perl::Tidy ) ],
+        requires => [qw( Perl::Tidy )],
         verbatim => 1,
     },
     html => {
         code     => \&html_filter,
-        requires => [ qw( Syntax::Highlight::HTML ) ],
+        requires => [qw( Syntax::Highlight::HTML )],
         verbatim => 1,
     },
 );
@@ -81,10 +85,8 @@ sub view_for {
     return $for->text() . "\n\n" if $format =~ /^html\b/;
     if ( $format =~ /^filter\b/ ) {
         my $lang = (split '=', $format)[1];
-        if( exists $filter{$lang} ) {
-            return $filter{$lang}{code}->( $for->text, "" ) . "\n\n";
-        }
-        else { carp "$lang not supported in =for filter"; }
+        $lang = exists $filter{$lang} ? $lang : 'default';
+        return $filter{$lang}{code}->( $for->text, "" ) . "\n\n";
     }
     # fall-through
     return '';
@@ -99,23 +101,21 @@ sub view_begin {
     }
     elsif( $format eq 'filter' ) {
         my ($lang, $opts) = split(' ', $args, 2);
-        if( exists $filter{$lang} ) {
-            my $output;
-            if( $filter{$lang}{verbatim} ) {
-                $HTML_PROTECT++;
-                $output =
-                  $filter{$lang}{code}
-                  ->( join( "\n\n", map { $_->text } $begin->content), $opts );
-                $HTML_PROTECT--;
-            }
-            else {
-                push @{$self->{FILTER}}, [ $lang, $opts ];
-                $output = $begin->content->present($self);
-                pop @{$self->{FILTER}};
-            }
-            return $output;
+        $lang = exists $filter{$lang} ? $lang : 'default';
+        my $output;
+        if( $filter{$lang}{verbatim} ) {
+            $HTML_PROTECT++;
+            $output =
+              $filter{$lang}{code}
+              ->( join( "\n\n", map { $_->text } $begin->content), $opts );
+            $HTML_PROTECT--;
         }
-        else { carp "$lang not supported in =begin filter"; }
+        else {
+            push @{$self->{FILTER}}, [ $lang, $opts ];
+            $output = $begin->content->present($self);
+            pop @{$self->{FILTER}};
+        }
+        return $output;
     }
     # fall-through
     return '';
@@ -208,7 +208,7 @@ sub perl_filter {
     Perl::Tidy::perltidy(
         source      => \$code,
         destination => \$output,
-        argv        => "-html -pre -npod " . $opts,
+        argv        => "-html -pre -nopod2html " . $opts,
         stderr      => '-',
         errorfile   => '-',
     );
