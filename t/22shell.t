@@ -12,11 +12,7 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 =for filter=shell echo "foo"
 ---
 <html><body bgcolor="#ffffff">
-<pre>
-echo <span class="s-quo">"</span><span class="s-val">foo</span><span class="s-quo">"</span>
-</pre>
-
-
+<pre>echo <span class="s-quo">"</span><span class="s-val">foo</span><span class="s-quo">"</span></pre>
 </body></html>
 ===
 =begin filter shell
@@ -28,6 +24,9 @@ echo <span class="s-quo">"</span><span class="s-val">foo</span><span class="s-qu
 =end filter
 ---
 <html><body bgcolor="#ffffff">
+<pre>    <span class="s-cmt">#!/bin/sh
+    </span>ps | /usr/lib/sendmail -t
+    exit 0</pre>
 </body></html>
 TESTS
 
@@ -41,6 +40,9 @@ my @tests2 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 =end filter
 ---
 <html><body bgcolor="#ffffff">
+<pre>    <span class="s-cmt">#!/bin/sh
+    </span><span class="s-avr">FOO</span>=<span class="s-val">bar
+    </span>echo <span class="s-var">$foo</span></pre>
 </body></html>
 TESTS
 
