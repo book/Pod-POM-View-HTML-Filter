@@ -67,9 +67,9 @@ $A++;
 <html><body bgcolor="#ffffff">
 <pre>    <span class="c"># a longer piece of code</span>
     <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
-
+    
     <span class="k">my</span> <span class="i">$A</span><span class="sc">;</span> <span class="c"># must declare</span>
-
+    
     <span class="i">$A</span>++<span class="sc">;</span></pre>
 </body></html>
 TESTS
