@@ -1,15 +1,10 @@
 Pod-POM-View-HTML-Filter
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+Pod::POM::View::HTML::Filter is a Pod::POM view used to filter
+some specially marked pod blocks.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it get an idea of the modules uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+It was first designed to output syntax-hightlighted Perl on some
+static webpages. Look, here: http://articles.mongueurs.net/magazines/
 
 INSTALLATION
 

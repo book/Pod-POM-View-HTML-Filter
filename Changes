@@ -1,7 +1,9 @@
-Revision history for Pod-POM-View-HTML-Syntax
+Revision history for Pod-POM-View-HTML-Filter
 
-0.01    
-        Supports
-        =begin syntax foo
-        =for syntax=foo
+0.01 Mon Jul 26 12:11:00 CEST 2004
+        [FEATURES]
+        - add(), know(), filters()
+        - =begin filter foo
+        - =for filter=foo
+        Did I mention it's the first version?
 
