@@ -7,6 +7,7 @@ META.yml			# Will be created by "make dist"
 README
 t/00.load.t
 t/10.interface.t
+t/11.filters.t
 t/20.perl.t
 t/pod-coverage.t
 t/pod.t
