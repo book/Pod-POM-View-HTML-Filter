@@ -123,7 +123,8 @@ sub view_begin {
         my $prev = '';
         my @blocks;
         for( @{ $begin->content } ) {
-            my $type = $_->type;
+            # FIXME bare text blocks appear sometimes
+            my $type = ref $_ ? $_->type : 'text';
 
             # catenate verbatim blocks together
             push @blocks, [
@@ -170,6 +171,13 @@ sub view_begin {
     return '';
 }
 
+# a simple filter output cleanup routine
+sub _cleanup {
+    local $_ = shift;
+    s!\A<pre>\n?|\n?</pre>\n\z!!gm; # remove <pre></pre>
+    $_;
+}
+
 # perl highlighting, thanks to Perl::Tidy
 sub perl_filter {
     my ($code, $opts) = ( shift, shift || "" );
@@ -189,9 +197,8 @@ sub perl_filter {
         stderr      => '-',
         errorfile   => '-',
     );
-    $output =~ s!\A<pre>\n?!!;    # Perl::Tidy adds "<pre>\n"
-    $output =~ s!\n</pre>\n\z!!m; #             and "\n</pre>\n"
-    $output =~ s/^/$ws/gm;        # put the indentation back
+    $output = _cleanup( $output ); # remove <pre></pre>
+    $output =~ s/^/$ws/gm;         # put the indentation back
 
     # put back Getopt::Long previous configuration, if needed
     Getopt::Long::Configure( $glc );
@@ -208,9 +215,7 @@ sub html_filter {
 
     my $parser = $filter_parser{html}{$opts}
       ||= Syntax::Highlight::HTML->new( map { (split /=/) } split ' ', $opts );
-    my $output = $parser->parse($code);
-    $output =~ s!\A<pre>|</pre>\z!!, ;
-    return $output;
+    return _cleanup( $parser->parse($code) );
 }
 
 # Shell highlighting thanks to Syntax::Highlight::Shell
@@ -219,9 +224,7 @@ sub shell_filter {
 
     my $parser = $filter_parser{shell}{$opts}
       ||= Syntax::Highlight::Shell->new( map { (split /=/) } split ' ', $opts );
-    my $output = $parser->parse($code);
-    $output =~ s!\A<pre>|</pre>\z!!, ;
-    return $output;
+    return _cleanup( $parser->parse($code) );
 }
 
 1;
