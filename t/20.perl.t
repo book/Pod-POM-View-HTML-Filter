@@ -74,11 +74,30 @@ $A++;
 </body></html>
 TESTS
 
-plan tests => scalar @tests;
+my @tests2 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
+=begin filter perl
+
+    $A++;
+
+=end 
+---
+<html><body bgcolor="#ffffff">
+<pre>    <span class="i">$A</span>++<span class="sc">;</span></pre>
+</body></html>
+TESTS
+
+plan tests => @tests + 2 * @tests2;
 
 my $parser = Pod::POM->new;
 for ( @tests ) {
     my $pom = $parser->parse_text( $_->[0] ) || diag $parser->error;
     is( "$pom", $_->[1], "Correct output" );
+}
+
+# check what happens if $pom->present is called twice in a row
+for ( @tests2 ) {
+    my $pom = $parser->parse_text( $_->[0] ) || diag $parser->error;
+    is( "$pom", $_->[1], "Correct output the first time" );
+    is( "$pom", $_->[1], "Correct output the second time around" );
 }
 
