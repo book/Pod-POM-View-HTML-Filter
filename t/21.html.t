@@ -100,10 +100,10 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 ---
 <html><body bgcolor="#ffffff">
 <pre>
-  1: <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 1<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-  2:     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 2<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-  3: 
-  4:     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
+<span class="h-lno">  1</span> <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 1<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  2</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 2<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  3</span> 
+<span class="h-lno">  4</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 TESTS
 
