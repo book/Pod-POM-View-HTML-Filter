@@ -1,5 +1,10 @@
 Revision history for Pod-POM-View-HTML-Filter
 
+0.02 Mon Jul 26 15:00:28 CEST 2004
+        [ENHANCEMENTS]
+        - limited support for =begin filter options
+        - perl_filter can now accept options (such as -nnn)
+
 0.01 Mon Jul 26 12:11:00 CEST 2004
         [FEATURES]
         - add(), know(), filters()
