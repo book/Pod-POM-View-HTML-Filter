@@ -3,17 +3,17 @@ use warnings;
 use Module::Build;
 
 my $builder = Module::Build->new(
-    module_name       => 'Pod::POM::View::HTML::Filter',
-    license           => '',
-    dist_author       => 'Philippe "BooK" Bruhat <book@cpan.org>',
-    dist_version_from => 'lib/Pod/POM/View/HTML/Filter.pm',
-    requires          => {
+    module_name        => 'Pod::POM::View::HTML::Filter',
+    dist_author        => 'Philippe "BooK" Bruhat <book@cpan.org>',
+    dist_version_from  => 'lib/Pod/POM/View/HTML/Filter.pm',
+    requires           => {
         'Test::More' => 0,
         'Pod::POM'   => '0.17'
     },
-    recommends        => { 'Perl::Tidy' => '20031021', },
-    license           => 'perl',
-    add_to_cleanup    => ['Pod-POM-View-HTML-Filter-*'],
+    recommends         => { 'Perl::Tidy' => '20031021', },
+    license            => 'perl',
+    add_to_cleanup     => ['Pod-POM-View-HTML-Filter-*'],
+    create_makefile_pl => 'traditional',
 );
 
 $builder->create_build_script();
