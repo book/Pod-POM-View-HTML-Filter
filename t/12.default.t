@@ -1,4 +1,4 @@
-use Test::More tests => 3;
+use Test::More tests => 5;
 use strict;
 use Pod::POM;
 use Pod::POM::View::HTML::Filter;
@@ -31,4 +31,48 @@ is( "$pom", << 'EOH', "Default is simply <pre>");
 <pre>    $A++;</pre></body></html>
 EOH
 
+# test $Pod::POM::View::HTML::Filter::default
+
+# add a foo filter
+Pod::POM::View::HTML::Filter->add(
+    foo  => { code => sub { my $s = shift; $s =~ s/foo/bar/g; $s } },
+);
+
+# check that it works
+$pom = $parser->parse_text(<<'EOT') or diag $parser->error;
+=begin filter foo
+
+bar foo bar
+baz
+
+=end
+EOT
+
+is( "$pom", <<'EOH', "Correct output" );
+<html><body bgcolor="#ffffff">
+<p>bar bar bar
+baz</p>
+</body></html>
+EOH
+
+# set it back to default
+Pod::POM::View::HTML::Filter->add(
+    $_ => $Pod::POM::View::HTML::Filter::default
+) for Pod::POM::View::HTML::Filter->filters;
+
+# check that foo == default
+$pom = $parser->parse_text(<<'EOT') or diag $parser->error;
+=begin filter foo
+
+bar foo bar
+baz
+
+=end
+EOT
+
+is( "$pom", <<'EOH', "Correct output" );
+<html><body bgcolor="#ffffff">
+<pre>bar foo bar
+baz</pre></body></html>
+EOH
 
