@@ -1,5 +1,24 @@
 Revision history for Pod-POM-View-HTML-Filter
 
+0.03 Thu Jul 29 01:01:30 CEST 2004
+        [ENHANCEMENTS]
+        - more flexible interface for the  add() method, that lets one
+          add more parameters to a filter (requires, verbatim)
+        - the verbatim mode for filters prevent the present()
+          method to be called on the verbatim, text and code items it
+          contains. The content of all items is catenated and passed to
+          the filter as a single block.
+        - support for html filtering, thanks to Maddingue's
+          Syntax::Highlight::HTML.
+        [BUGS]
+        - for some unknown reason, presenting the pod twice is broken
+          with the perl filter (TODO test added). I suspect the problem
+        - view_seq_text is copied verbatim from Pod::POM::View::HTML,
+          because I need to access a private variable. This should be
+          fixed, because duplicated code is never good.
+        [FIXES]
+        - Makefile.PL lists the prerequisites forgotten in 0.02
+
 0.02 Mon Jul 26 15:00:28 CEST 2004
         [ENHANCEMENTS]
         - limited support for =begin filter options
