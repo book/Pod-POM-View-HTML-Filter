@@ -244,9 +244,9 @@ Pod::POM::View::HTML::Filter - Use filters on sections of your pod documents
 
 =head1 SYNOPSIS
 
-In your Pod:
+In your POD:
 
-    Some colored Perl code:
+    Some coloured Perl code:
 
     =begin filter perl
 
@@ -278,6 +278,53 @@ In your code:
     my $pom = Pod::POM->parse_file( '/my/pod/file' );
     $pom->present($view);
 
+=begin html
+
+<style type="text/css">
+<!--
+/* HTML colouring styles */
+.h-decl { color: #336699; font-style: italic; }   /* doctype declaration  */
+.h-pi   { color: #336699;                     }   /* process instruction  */
+.h-com  { color: #338833; font-style: italic; }   /* comment              */
+.h-ab   { color: #000000; font-weight: bold;  }   /* angles as tag delim. */
+.h-tag  { color: #993399; font-weight: bold;  }   /* tag name             */
+.h-attr { color: #000000; font-weight: bold;  }   /* attribute name       */
+.h-attv { color: #333399;                     }   /* attribute value      */
+.h-ent  { color: #cc3333;                     }   /* entity               */
+.h-lno  { color: #aaaaaa; background: #f7f7f7;}   /* line numbers         */
+
+/* Perl colouring styles */
+.c  { color: #228B22;} /* comment */
+.cm { color: #000000;} /* comma */
+.co { color: #000000;} /* colon */
+.h  { color: #CD5555; font-weight:bold;} /* here-doc-target */
+.hh { color: #CD5555; font-style:italic;} /* here-doc-text */
+.i  { color: #00688B;} /* identifier */
+.j  { color: #CD5555; font-weight:bold;} /* label */
+.k  { color: #8B008B; font-weight:bold;} /* keyword */
+.m  { color: #FF0000; font-weight:bold;} /* subroutine */
+.n  { color: #B452CD;} /* numeric */
+.p  { color: #000000;} /* paren */
+.pd { color: #228B22; font-style:italic;} /* pod-text */
+.pu { color: #000000;} /* punctuation */
+.q  { color: #CD5555;} /* quote */
+.s  { color: #000000;} /* structure */
+.sc { color: #000000;} /* semicolon */
+.v  { color: #B452CD;} /* v-string */
+.w  { color: #000000;} /* bareword */
+-->
+</style>
+
+<p>The resulting HTML will look like this (modulo the stylesheet):</p>
+
+<pre>    <span class="c"># now in full colour!</span>
+    <span class="i">$A</span>++<span class="sc">;</span></pre>
+<pre><span class="i">$A</span>++<span class="sc">;</span> <span class="c"># this works too</span></pre>
+<p>This should read <code>bar bar bar</code>:</p>
+<p>bar bar bar</p>
+
+=end html
+
 =head1 DESCRIPTION
 
 This module is a subclass of Pod::POM::View::HTML that support the
@@ -296,15 +343,15 @@ or
     $Pod::POM::DEFAULT_VIEW = Pod::POM::View::HTML::Filter->new;
     $pom->present;
 
-Please note that even though the module was specifically designed
+Even though the module was specifically designed
 for use with Perl::Tidy, you can write your own filters quite
-easily.
+easily (see L<Writing your own filters>).
 
 =head1 FILTERING POD?
 
 The whole idea of this module is to take advantage of all the syntax
-coloring modules that exist (actually, Perl::Tidy was my first target)
-to produce colorful code examples in a POD document (after conversion
+colouring modules that exist (actually, Perl::Tidy was my first target)
+to produce colourful code examples in a POD document (after conversion
 to HTML).
 
 Filters can be used in two different POD constructs:
@@ -316,10 +363,29 @@ Filters can be used in two different POD constructs:
 The data in the C<=begin filter> ... C<=end filter> region is passed to
 the filter and the result is output in place in the document.
 
+The general form of a C<=begin filter> block is as follow:
+
+    =begin filter lang optionstring
+
+    # some text to process with filter "lang"
+
+    =end filter
+
+The optionstring is trimed for whitespace and passed as a single string
+to the filter routine which must perform its own parsing.
+
 =item C<=for filter=I<filter>>
 
 C<=for> filters work just like C<=begin>/C=<end> filters, except that
 a single paragraph is the target.
+
+The general form of a C<=for filter> block is as follow:
+
+    =for filter=lang:option1:option2
+    # some code in language lang
+
+The option string sent to the filter C<lang> would be C<option1 option2>
+(colons are replaced with spaces).
 
 =back
 
@@ -381,11 +447,11 @@ will return C<bar ba! baz>.
 
 Verbatim paragraphs are catenated together to form a single block
 of text, that is passed to the filter. Text paragraphs can contain
-POD escape sequences, such as BE<lt>...E<gt>.
+POD escape sequences, such as C<BE<lt>...E<gt>>.
 
 These escape sequences are processed B<before> the paragraph is passed
 through the filter stack. A C<=for> block always contains a text block,
-not a paragraph, even if it starts with whitespace.
+not a verbatim block, even if it starts with whitespace.
 
 This means that the following block:
 
@@ -445,7 +511,76 @@ C<    verbatim 3>
 Each block will be filtered independently by the filter stack and the result
 will be catenated together and output in your HTML document.
 
-=head2 Examples and caveats
+=head2 Examples
+
+An example of the power of pipes can be seen in the following example.
+Take a bit of Perl code to colour:
+
+    =begin filter perl
+
+        "hot cross buns" =~ /cross/;
+        print "Matched: <$`> $& <$'>\n";    # Matched: <hot > cross < buns>
+        print "Left:    <$`>\n";            # Left:    <hot >
+        print "Match:   <$&>\n";            # Match:   <cross>
+        print "Right:   <$'>\n";            # Right:   < buns>
+
+    =end
+
+This will produce the following HTML code:
+
+    <pre>    <span class="q">&quot;hot cross buns&quot;</span> =~ <span class="q">/cross/</span><span class="sc">;</span>
+         <span class="k">print</span> <span class="q">&quot;Matched: &lt;$`&gt; $&amp; &lt;$'&gt;\n&quot;</span><span class="sc">;</span>    <span class="c"># Matched: &lt;hot &gt; cross &lt; buns&gt;</span>
+         <span class="k">print</span> <span class="q">&quot;Left:    &lt;$`&gt;\n&quot;</span><span class="sc">;</span>            <span class="c"># Left:    &lt;hot &gt;</span>
+         <span class="k">print</span> <span class="q">&quot;Match:   &lt;$&amp;&gt;\n&quot;</span><span class="sc">;</span>            <span class="c"># Match:   &lt;cross&gt;</span>
+         <span class="k">print</span> <span class="q">&quot;Right:   &lt;$'&gt;\n&quot;</span><span class="sc">;</span>            <span class="c"># Right:   &lt; buns&gt;</span></pre>
+
+=begin html
+
+<p>Which your browser will render as:</p>
+
+<pre>    <span class="q">&quot;hot cross buns&quot;</span> =~ <span class="q">/cross/</span><span class="sc">;</span>
+    <span class="k">print</span> <span class="q">&quot;Matched: &lt;$`&gt; $&amp; &lt;$'&gt;\n&quot;</span><span class="sc">;</span>    <span class="c"># Matched: &lt;hot &gt; cross &lt; buns&gt;</span>
+    <span class="k">print</span> <span class="q">&quot;Left:    &lt;$`&gt;\n&quot;</span><span class="sc">;</span>            <span class="c"># Left:    &lt;hot &gt;</span>
+    <span class="k">print</span> <span class="q">&quot;Match:   &lt;$&amp;&gt;\n&quot;</span><span class="sc">;</span>            <span class="c"># Match:   &lt;cross&gt;</span>
+    <span class="k">print</span> <span class="q">&quot;Right:   &lt;$'&gt;\n&quot;</span><span class="sc">;</span>            <span class="c"># Right:   &lt; buns&gt;</span></pre>
+
+=end html
+
+Now if you want to colour and number the HTML code produced, it's as simple
+as tackling the C<html> on top of the C<perl> filter:
+
+    =begin filter perl | html nnn=1
+
+        "hot cross buns" =~ /cross/;
+        print "Matched: <$`> $& <$'>\n";    # Matched: <hot > cross < buns>
+        print "Left:    <$`>\n";            # Left:    <hot >
+        print "Match:   <$&>\n";            # Match:   <cross>
+        print "Right:   <$'>\n";            # Right:   < buns>
+
+    =end
+
+Which produces the rather unreadable piece of HTML:
+
+    <pre><span class="h-lno">  1</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>hot cross buns<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> =~ <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span>/cross/<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+    <span class="h-lno">  2</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Matched: <span class="h-ent">&amp;lt;</span>$`<span class="h-ent">&amp;gt;</span> $<span class="h-ent">&amp;amp;</span> <span class="h-ent">&amp;lt;</span>$'<span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>    <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Matched: <span class="h-ent">&amp;lt;</span>hot <span class="h-ent">&amp;gt;</span> cross <span class="h-ent">&amp;lt;</span> buns<span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+    <span class="h-lno">  3</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Left:    <span class="h-ent">&amp;lt;</span>$`<span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>            <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Left:    <span class="h-ent">&amp;lt;</span>hot <span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+    <span class="h-lno">  4</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Match:   <span class="h-ent">&amp;lt;</span>$<span class="h-ent">&amp;amp;</span><span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>            <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Match:   <span class="h-ent">&amp;lt;</span>cross<span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+    <span class="h-lno">  5</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Right:   <span class="h-ent">&amp;lt;</span>$'<span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>            <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Right:   <span class="h-ent">&amp;lt;</span> buns<span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span></pre>
+
+=begin html
+
+<p>But your your browser will render it as:</p>
+
+
+<pre><span class="h-lno">  1</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>hot cross buns<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> =~ <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span>/cross/<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  2</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Matched: <span class="h-ent">&amp;lt;</span>$`<span class="h-ent">&amp;gt;</span> $<span class="h-ent">&amp;amp;</span> <span class="h-ent">&amp;lt;</span>$'<span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>    <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Matched: <span class="h-ent">&amp;lt;</span>hot <span class="h-ent">&amp;gt;</span> cross <span class="h-ent">&amp;lt;</span> buns<span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  3</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Left:    <span class="h-ent">&amp;lt;</span>$`<span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>            <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Left:    <span class="h-ent">&amp;lt;</span>hot <span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  4</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Match:   <span class="h-ent">&amp;lt;</span>$<span class="h-ent">&amp;amp;</span><span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>            <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Match:   <span class="h-ent">&amp;lt;</span>cross<span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  5</span>     <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Right:   <span class="h-ent">&amp;lt;</span>$'<span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>            <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Right:   <span class="h-ent">&amp;lt;</span> buns<span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span></pre>
+
+=end html
+
+=head2 Caveats
 
 Since a text paragraph is preprocessed for POD escape sequences, the
 following block
@@ -456,33 +591,20 @@ following block
 
     =end
 
-will produce this:
+will be transformed into C< <b>foo</b> > before being passed to the
+filters, which will produce this:
 
     <pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>foo<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
 
 =begin html
 
-<p>Which a web browser will render as:</p>
-<style type="text/css">
-<!--
-.h-decl { color: #336699; font-style: italic; }   /* doctype declaration  */
-.h-pi   { color: #336699;                     }   /* process instruction  */
-.h-com  { color: #338833; font-style: italic; }   /* comment              */
-.h-ab   { color: #000000; font-weight: bold;  }   /* angles as tag delim. */
-.h-tag  { color: #993399; font-weight: bold;  }   /* tag name             */
-.h-attr { color: #000000; font-weight: bold;  }   /* attribute name       */
-.h-attv { color: #333399;                     }   /* attribute value      */
-.h-ent  { color: #cc3333;                     }   /* entity               */
-
-.h-lno  { color: #aaaaaa; background: #f7f7f7;}   /* line numbers         */
--->
-</style>
+<p>This will be rendered by your web browser as:</p>
 
     <pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>foo<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
 
 =end html
 
-Whereas
+Whereas the same text in a verbatim block
 
     =begin filter html
     
@@ -502,6 +624,8 @@ will produce:
 
 =end html
 
+Not quite the same, isn't it?
+
 =head1 METHODS
 
 =head2 Public methods
@@ -510,7 +634,7 @@ The following methods are available:
 
 =over 4
 
-=item add( lang => { options }, ... )
+=item C<< add( lang => { I<options> }, ... ) >>
 
 Add support for one or more languages. Options are passed in a hash
 reference.
@@ -534,11 +658,11 @@ Available options are:
 
 Note that C<add()> is a class method.
 
-=item filters()
+=item C<filters()>
 
 Return the list of languages supported.
 
-=item know( I<$lang> )
+=item C<know( I<$lang> )>
 
 Return true if the view knows how to handle language C<$lang>.
 
@@ -551,7 +675,7 @@ Pod::POM::View::HTML::Filter:
 
 =over 4
 
-=item new()
+=item C<new()>
 
 The overloaded constructor initialises some internal structures.
 This means that you'll have to use a instance of the class as a
@@ -567,28 +691,11 @@ view for your Pod::POM object. Therefore you must use C<new>.
     my $view = Pod::POM::View::HTML::Filter->new;
     $pom->present( $view );
 
-=item view_begin
+=item C<view_begin()>
 
-To be used as:
+=item C<view_for()>
 
-    =begin filter lang optionstring
-
-    # some text to process with filter "lang"
-
-    =end filter
-
-The optionstring is trimed for whitespace and passed as a single string
-to the filter routine which must perform its own parsing.
-
-=item view_for
-
-To be used as:
-
-    =for filter=lang:option1:option2
-    # some code in language lang
-
-The option string sent to the filter C<lang> would be C<option1 option2>
-(colons are replaced with spaces).
+These are the methods that support the C<filter> format.
 
 =back
 
@@ -597,17 +704,17 @@ The option string sent to the filter C<lang> would be C<option1 option2>
 =head2 Built-in filters
 
 Pod::POM::View::HTML::Filter is shipped with a few built-in filters.
-They are all functions named I<lang>_filter.
 
 =over 4
 
 =item default
 
 This filter is called when the required filter is not known by
-Pod::POM::View::HTML::Filter. It simply wraps the content of the 
-=begin / =end section between C<< <pre> >>/C<< </pre> >>.
+Pod::POM::View::HTML::Filter. It does nothing more than normal POD
+processing (POD escapes for text paragraphs and C<< <pre> >> for
+verbatim paragraphs.
 
-The default filter is available from
+The default filter initialisation structure is available from
 C<$Pod::POM::View::HTML::Filter::default>. This allows one to do:
 
     Pod::POM::View::HTML::Filter->add(
@@ -665,8 +772,8 @@ Write a filter is quite easy: a filter is a subroutine that takes two
 arguments (text to parse and option string) and returns the filtered
 string.
 
-The filter is then added to Pod::POM::View::HTML::Filter with the
-add() method:
+The filter is added to Pod::POM::View::HTML::Filter's internal filter
+list with the C<add()> method:
 
     $view->add(
         foo => {
@@ -683,15 +790,15 @@ When presenting the following piece of pod,
 
     =end filter
 
-the foo_filter() routine will be called with two arguments, like this:
+the C<foo_filter()> routine will be called with two arguments, like this:
 
     foo_filter( "Some text to filter.", "bar baz" );
 
 If you have a complex set of options, your routine will have to parse 
 the option string itself.
 
-Please note that when called in a C<=for> construct, no option string
-is passed to the filter.
+Please note that in a C<=for> construct, whitespace in the option string
+must be replaced with colons.
 
 =head1 BUILT-IN FILTERS CSS STYLES
 
@@ -727,7 +834,7 @@ Here are the styles used by Perl::Tidy:
 
 =head2 C<html> filter
 
-Syntax::Highlight::HTML defines the following styles:
+Syntax::Highlight::HTML makes use of the following styles:
 
     h-decl   declaration    # declaration <!DOCTYPE ...>
     h-pi     process        # process instruction <?xml ...?>
@@ -740,7 +847,7 @@ Syntax::Highlight::HTML defines the following styles:
 
 =head2 C<shell> filter
 
-Syntax::Highlight::Shell defines the following styles:
+Syntax::Highlight::Shell makes use of the following styles:
 
     s-key                   # shell keywords (like if, for, while, do...)
     s-blt                   # the builtins commands
@@ -753,17 +860,18 @@ Syntax::Highlight::Shell defines the following styles:
     s-val                   # shell values (inside quotes)
     s-cmt                   # shell comments
 
-=head1 AUTHOR
-
-Philippe "BooK" Bruhat, C<< <book@cpan.org> >>
-
 =head1 HISTORY
 
 The goal behind this module was to produce nice looking HTML pages from the
 articles the French Perl Mongers are writing for the French magazine
 GNU/Linux Magazine France (L<http://www.linuxmag-france.org/>).
 
-The result are available at L<http://articles.mongueurs.net/magazines/>.
+The resulting web pages are available at
+L<http://articles.mongueurs.net/magazines/>.
+
+=head1 AUTHOR
+
+Philippe "BooK" Bruhat, C<< <book@cpan.org> >>
 
 =head1 THANKS
 
@@ -771,6 +879,9 @@ Many thanks to Sébastien Aperghis-Tramoni (Maddingue), who helped
 debugging the module and wrote Syntax::Highlight::HTML and
 Syntax::Highlight::Shell so that I could ship PPVHF with more than
 one filter.
+
+Perl code examples where borrowed in Amelia,
+aka I<Programming Perl, 3rd edition>.
 
 =head1 BUGS
 
