@@ -37,7 +37,9 @@ bar foo bar
 para
 ---
 <html><body bgcolor="#ffffff">
-bar bar bar<p>para</p>
+bar bar bar
+
+<p>para</p>
 </body></html>
 ===
 =pod
@@ -53,7 +55,9 @@ para
 <html><body bgcolor="#ffffff">
 <p>para</p>
 bar bar bar
-bar bar bar<p>para</p>
+bar bar bar
+
+<p>para</p>
 </body></html>
 TESTS
 
