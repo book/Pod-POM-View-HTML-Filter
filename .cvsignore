@@ -6,7 +6,7 @@ Makefile.old
 pm_to_blib*
 *.tar.gz
 .lwpcookies
-Pod-POM-View-HTML-Syntax-*
+Pod-POM-View-HTML-Filter-*
 cover_db
 mess
 dist
