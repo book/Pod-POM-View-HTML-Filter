@@ -5,12 +5,12 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
-t/00.load.t
-t/00.versions.t
-t/10.interface.t
-t/11.filters.t
-t/12.default.t
-t/20.perl.t
-t/21.html.t
+t/00load.t
+t/00versions.t
+t/10interface.t
+t/11filters.t
+t/12default.t
+t/20perl.t
+t/21html.t
 t/pod-coverage.t
 t/pod.t
