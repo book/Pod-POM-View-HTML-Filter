@@ -75,8 +75,8 @@ plan tests => scalar @tests;
 
 # add a new language
 Pod::POM::View::HTML::Filter->add(
-    foo     => sub { my $s = shift; $s =~ s/foo/bar/g; $s },
-    options => sub { "[$_[0]]<$_[1]>" },
+    foo     => { code => sub { my $s = shift; $s =~ s/foo/bar/g; $s } },
+    options => { code => sub { "[$_[0]]<$_[1]>" } },
 );
 
 my $parser = Pod::POM->new;
