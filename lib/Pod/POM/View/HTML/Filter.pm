@@ -208,7 +208,7 @@ sub perl_filter {
     Perl::Tidy::perltidy(
         source      => \$code,
         destination => \$output,
-        argv        => "-html -pre -nopod2html " . $opts,
+        argv        => "-html -pre -npod " . $opts,
         stderr      => '-',
         errorfile   => '-',
     );
