@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More tests => 9;
 use strict;
 use Pod::POM;
 use Pod::POM::View::HTML::Filter;
@@ -25,4 +25,8 @@ $view->add( foo2 => { code => sub { "foo" } } );
 is( @foo_filters, 2, "There are two foo filters");
 ok( $view->know( 'foo2' ), "Hey, I know foo2 now" );
 ok( ! $view->know( 'bar' ), "Still don't know bar" );
+
+# test errors
+eval { $view->add( klonk => { verbatim => 1 } ) };
+like( $@, qr/^klonk: no code parameter given/, "code is required for add()" );
 
