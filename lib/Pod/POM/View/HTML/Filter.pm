@@ -7,7 +7,7 @@ use strict;
 use Carp;
 
 our $VERSION = '0.05';
-our $default = { code     => sub { '<pre>' . $_[0] . '</pre>' } };
+our $default = { code     => sub { $_[0] } };
 
 my %filter;
 my %builtin = (
@@ -86,10 +86,11 @@ sub view_for {
     my $format = $for->format;
 
     return $for->text() . "\n\n" if $format =~ /^html\b/;
+
     if ( $format =~ /^filter\b/ ) {
         my $lang = (split '=', $format)[1];
         $lang = exists $filter{$lang} ? $lang : 'default';
-        return $filter{$lang}{code}->( $for->text, "" ) . "\n\n";
+        return $filter{$lang}{code}->( $for->text, "" ) . "(for)\n\n";
     }
     # fall-through
     return '';
@@ -104,30 +105,53 @@ sub view_begin {
     }
     elsif( $format eq 'filter' ) {
         my @filters = split /\|/, $args;
-        my $output;
 
-        # fetch the whole begin section content
+        # fetch the text and verbatim blocks in the begin section
+        # and remember the type of each block
+        my $prev = '';
+        my @blocks;
         for( @{ $begin->content } ) {
-            $output .= $_->text() . "\n\n"
-              if ( $_->type eq 'verbatim' );
-    
-            $output .= "$_", $output =~ s{^<p>|</p>$}{}gm
-              if ( $_->type eq 'text' );
+            my $type = $_->type;
+
+            # catenate verbatim blocks together
+            push @blocks, [
+              ( $type eq $prev ? (pop @blocks)->[0] . "\n\n" : '' )
+                . $_->text(),
+              $type
+            ] if $type eq 'verbatim';
+
+            # quotes force Pod::POM to present the $_ data in html
+            push @blocks, [
+              (s{\A<p>|</p>[\n\r]*\z}{}g, $_)[1],
+              $type
+            ] if $type eq 'text'; 
+
+            # remember what we just saw
+            $prev = $type;
         }
 
-        # now pass it though the filter list
-        my $verbatim;
-        for(@filters) {
-            my ($lang, $opts) = split(' ', $_, 2);
-            $lang = exists $filter{$lang} ? $lang : 'default';
+        # now pass the block list through the filter list
+        for my $block (@blocks) {
+            my $verbatim;
+            for my $f (@filters) {
+                my ( $lang, $opts ) = split( ' ', $f, 2 );
+                $lang = exists $filter{$lang} ? $lang : 'default';
 
-            $output   = $filter{$lang}{code}->( $output, $opts );
-            $verbatim = $filter{lang}{verbatim};
+                $block->[0] = $filter{$lang}{code}->( $block->[0], $opts );
+                $verbatim   = $filter{lang}{verbatim};
+            }
+
+            # the enclosing tags depend on the block and the last filter
+            $block = sprintf(
+                ( $verbatim || $block->[1] eq 'verbatim'
+                  ? "<pre>%s</pre>\n"
+                  : "<p>%s</p>\n"     ),
+                $block->[0]
+            );
         }
 
         # the tags depend on the last filter only
-        return
-          sprintf( ( $verbatim ? '<pre>%s</pre>' : '<p>%s</p>' ), $output );
+        return join $/, @blocks;
     }
 
     # fall-through
