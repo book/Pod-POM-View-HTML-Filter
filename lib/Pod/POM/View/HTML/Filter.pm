@@ -205,6 +205,11 @@ sub perl_filter {
     my ($ws) = $code =~ /^(\s*)/; # count the blanks on the first line
     $code =~ s/^$ws//gm;          # remove them
 
+    # Perl::Tidy 20031021 uses Getopt::Long and expects the default config
+    # this is a workaround (a patch was sent to Perl::Tidy's author)
+    my $glc = Getopt::Long::Configure();
+    Getopt::Long::ConfigDefaults();
+
     Perl::Tidy::perltidy(
         source      => \$code,
         destination => \$output,
@@ -215,6 +220,9 @@ sub perl_filter {
     $output =~ s!\A<pre>\n?!!;    # Perl::Tidy adds "<pre>\n"
     $output =~ s!\n</pre>\n\z!!m; #             and "\n</pre>\n"
     $output =~ s/^/$ws/gm;        # put the indentation back
+
+    # put back Getopt::Long previous configuration, if needed
+    Getopt::Long::Configure( $glc );
 
     return "<pre>$output</pre>\n";
 }
