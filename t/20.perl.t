@@ -12,7 +12,8 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 =for filter=perl $A++; # this works too
 ---
 <html><body bgcolor="#ffffff">
-<span class="i">$A</span>++<span class="sc">;</span> <span class="c"># this works too</span>
+<pre><span class="i">$A</span>++<span class="sc">;</span> <span class="c"># this works too</span></pre>
+
 
 </body></html>
 ===
@@ -24,8 +25,8 @@ $A++;
 =end filter
 ---
 <html><body bgcolor="#ffffff">
-<p><span class="c"># now in full colour!</span>
-<span class="i">$A</span>++<span class="sc">;</span></p>
+<pre><span class="c"># now in full colour!</span>
+<span class="i">$A</span>++<span class="sc">;</span></pre>
 </body></html>
 ===
 =begin filter perl
@@ -38,7 +39,6 @@ $A++;
 <html><body bgcolor="#ffffff">
 <pre>    <span class="c"># now in verbatim</span>
     <span class="i">$A</span>++<span class="sc">;</span></pre>
-
 </body></html>
 ===
 =begin filter perl -nnn
@@ -51,7 +51,26 @@ $A++;
 <html><body bgcolor="#ffffff">
 <pre>       1 <span class="c"># now in verbatim</span>
        2 <span class="i">$A</span>++<span class="sc">;</span></pre>
+</body></html>
+===
+=begin filter perl
 
+    # a longer piece of code
+    use strict;
+
+    my $A; # must declare
+
+    $A++;
+
+=end filter
+---
+<html><body bgcolor="#ffffff">
+<pre>    <span class="c"># a longer piece of code</span>
+    <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+
+    <span class="k">my</span> <span class="i">$A</span><span class="sc">;</span> <span class="c"># must declare</span>
+
+    <span class="i">$A</span>++<span class="sc">;</span></pre>
 </body></html>
 TESTS
 
