@@ -1,6 +1,6 @@
 Revision history for Pod-POM-View-HTML-Filter
 
-0.03 Thu Jul 29 01:01:30 CEST 2004
+0.03 Thu Jul 29 01:05:02 CEST 2004
         [ENHANCEMENTS]
         - more flexible interface for the  add() method, that lets one
           add more parameters to a filter (requires, verbatim)
@@ -12,7 +12,7 @@ Revision history for Pod-POM-View-HTML-Filter
           Syntax::Highlight::HTML.
         [BUGS]
         - for some unknown reason, presenting the pod twice is broken
-          with the perl filter (TODO test added). I suspect the problem
+          with the perl filter (TODO test added).
         - view_seq_text is copied verbatim from Pod::POM::View::HTML,
           because I need to access a private variable. This should be
           fixed, because duplicated code is never good.
