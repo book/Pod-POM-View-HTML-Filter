@@ -26,7 +26,6 @@ baz</p>
 ---
 <html><body bgcolor="#ffffff">
 <pre>    bar bar baz</pre>
-
 </body></html>
 ===
 this line is considered code by Pod::POM
@@ -69,6 +68,19 @@ The options are:
 <html><body bgcolor="#ffffff">
 <p>[The options are:]<a b c></p>
 </body></html>
+===
+=begin filter verb
+
+    verbatim block
+
+verbatim textblock
+
+=end
+---
+<html><body bgcolor="#ffffff">
+<pre>    verbatim block</pre>
+<pre>verbatim textblock</pre>
+</body></html>
 TESTS
 
 plan tests => scalar @tests + 2;
@@ -77,6 +89,7 @@ plan tests => scalar @tests + 2;
 Pod::POM::View::HTML::Filter->add(
     foo     => { code => sub { my $s = shift; $s =~ s/foo/bar/g; $s } },
     options => { code => sub { "[$_[0]]<$_[1]>" } },
+    verb    => { code => sub { $_[0] }, verbatim => 1 },
 );
 
 my $parser = Pod::POM->new;
@@ -96,7 +109,6 @@ EOT
 my $expected = << 'EOT';
 <html><body bgcolor="#ffffff">
 <pre>    bar bar baz</pre>
-
 </body></html>
 EOT
 
