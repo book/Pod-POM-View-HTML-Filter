@@ -46,7 +46,7 @@ sub know {
     return exists $filter{$lang};
 }
 
-sub langs { keys %filter; }
+sub filters { keys %filter; }
 
 #
 # overridden Pod::POM::View::HTML methods
@@ -140,6 +140,10 @@ Pod::POM::View::HTML::Filter - Use filters on sections of your pod documents
 
 =head1 SYNOPSIS
 
+In your Pod:
+
+    Some colored Perl code:
+
     =begin filter perl
 
         # now in full colour!
@@ -148,6 +152,22 @@ Pod::POM::View::HTML::Filter - Use filters on sections of your pod documents
     =end filter
 
     =for filter=perl $A++; # this works too
+
+    This should read C<bar bar bar>:
+
+    =begin filter foo
+
+    bar foo bar
+
+    =end filter
+
+In your code:
+
+    my $view = Pod::POM::View::HTML::Filter->new;
+    $view->add( foo => sub { my $s = shift; $s =~ s/foo/bar/gm; $s } );
+
+    my $pom = Pod::POM->parse_file( '/my/pod/file' );
+    $pom->present($view);
 
 =head1 DESCRIPTION
 
@@ -187,7 +207,7 @@ hopefully).
 
 Note that C<add()> is a class method.
 
-=item langs()
+=item filters()
 
 Return the list of languages supported.
 
@@ -197,12 +217,16 @@ Return true if the view knows how to handle language C<$lang>.
 
 =back
 
-=head2 Overridden methods
+=head2 Overloaded methods
 
 The following Pod::POM::View::HTML methods are overridden in
 Pod::POM::View::HTML::Filter:
 
 =over 4
+
+=item new()
+
+The overloaded constructor initialises some internal structures.
 
 =item view_for
 
@@ -220,6 +244,26 @@ To be used as:
     # some code in language lang
 
     =end filter
+
+=item view_textblock
+=item view_verbatim
+
+Since C<=begin>/C<=end> and C<=for> blocks contain C<verbatim> and C<text>,
+only these methods are overloaded.
+
+=back
+
+=head2 Built-in filters
+
+Pod::POM::View::HTML::Filter is shipped with a few built-in filters.
+They are all functions named I<lang>_filter.
+
+=over 4
+
+=item perl_filter
+
+This filter does Perl syntax highlighting with a lot of help from
+Perl::Tidy.
 
 =back
 
