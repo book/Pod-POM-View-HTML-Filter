@@ -387,6 +387,12 @@ The C<=for> construct does not support filter options.
 Since C<=begin>/C<=end> and C<=for> blocks contain C<verbatim> and C<text>,
 only these methods are overloaded.
 
+=item view_seq_text
+
+This method was copied verbatim from Pod::POM::View::HTML, and will
+remain until there's a way to modify $HTML_PROTECT from outside
+Pod::POM::View::HTML.
+
 =back
 
 =head2 Built-in filters
