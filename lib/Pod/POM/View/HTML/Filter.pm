@@ -165,7 +165,7 @@ sub html_filter {
     my ($code, $opts) = ( shift, shift || "" );
 
     my $parser = $html_filter_parser{$opts}
-      || Syntax::Highlight::HTML->new( map { ( split /=/ ) } split ' ', $opts );
+      ||= Syntax::Highlight::HTML->new( map { (split /=/) } split ' ', $opts );
     return $parser->parse($code);
 }
 
