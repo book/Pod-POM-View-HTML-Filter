@@ -40,6 +40,19 @@ $A++;
     <span class="i">$A</span>++<span class="sc">;</span></pre>
 
 </body></html>
+===
+=begin filter perl -nnn
+
+    # now in verbatim
+    $A++;
+
+=end filter
+---
+<html><body bgcolor="#ffffff">
+<pre>       1 <span class="c"># now in verbatim</span>
+       2 <span class="i">$A</span>++<span class="sc">;</span></pre>
+
+</body></html>
 TESTS
 
 plan tests => scalar @tests;
