@@ -3,7 +3,7 @@ use strict;
 use Pod::POM;
 use Pod::POM::View::HTML::Filter;
 
-plan skip_all => "Syntax::Highlight::HTML not installed"
+plan skip_all => "Don't know html"
   unless Pod::POM::View::HTML::Filter->know( 'html' );
 
 $Pod::POM::DEFAULT_VIEW = Pod::POM::View::HTML::Filter->new;
