@@ -389,9 +389,8 @@ only these methods are overloaded.
 
 =item view_seq_text
 
-This method was copied verbatim from Pod::POM::View::HTML, and will
-remain until there's a way to modify $HTML_PROTECT from outside
-Pod::POM::View::HTML.
+This method was copied verbatim from Pod::POM::View::HTML.
+This is an ugly hack and should disappear in future releases.
 
 =back
 
