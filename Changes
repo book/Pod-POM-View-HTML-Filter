@@ -1,0 +1,7 @@
+Revision history for Pod-POM-View-HTML-Syntax
+
+0.01    
+        Supports
+        =begin syntax foo
+        =for syntax=foo
+
