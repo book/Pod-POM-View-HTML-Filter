@@ -19,3 +19,4 @@ CVS/
 ^TODO$
 ^.cvsignore$
 ^t/01pod.t$
+^Pod-POM-View-HTML-Filter-
