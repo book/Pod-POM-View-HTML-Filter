@@ -142,6 +142,61 @@ sub view_verbatim {
     return "<pre>$text</pre>\n\n";
 }
 
+# mostly taken from Pod::POM::View::HTML
+# because it's a closure around the syntactical $HTML_PROTECT
+
+# this code has been borrowed from Pod::Html
+my $urls = '(' . join ('|',
+     qw{
+       http
+       telnet
+       mailto
+       news
+       gopher
+       file
+       wais
+       ftp
+     } ) . ')';
+my $ltrs = '\w';
+my $gunk = '/#~:.?+=&%@!\-';
+my $punc = '.:!?\-;';
+my $any  = "${ltrs}${gunk}${punc}";
+
+sub view_seq_text {
+     my ($self, $text) = @_;
+
+     unless ($HTML_PROTECT) {
+        for ($text) {
+            s/&/&amp;/g;
+            s/</&lt;/g;
+            s/>/&gt;/g;
+        }
+     }
+
+     $text =~ s{
+        \b                           # start at word boundary
+         (                           # begin $1  {
+           $urls     :               # need resource and a colon
+          (?!:)                     # Ignore File::, among others.
+           [$any] +?                 # followed by one or more of any valid
+                                     #   character, but be conservative and
+                                     #   take only what you need to....
+         )                           # end   $1  }
+         (?=                         # look-ahead non-consumptive assertion
+                 [$punc]*            # either 0 or more punctuation followed
+                 (?:                 #   followed
+                     [^$any]         #   by a non-url char
+                     |               #   or
+                     $               #   end of the string
+                 )                   #
+             |                       # or else
+                 $                   #   then end of the string
+         )
+       }{<a href="$1">$1</a>}igox;
+
+     return $text;
+}
+
 # perl highlighting, thanks to Perl::Tidy
 sub perl_filter {
     my ($code, $opts) = ( shift, shift || "" );
