@@ -13,8 +13,6 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 ---
 <html><body bgcolor="#ffffff">
 <pre><span class="i">$A</span>++<span class="sc">;</span> <span class="c"># this works too</span></pre>
-
-
 </body></html>
 ===
 =begin filter perl
