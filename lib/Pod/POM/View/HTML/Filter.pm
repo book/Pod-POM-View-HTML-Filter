@@ -14,6 +14,11 @@ my %builtin = (
         requires => [ qw( Perl::Tidy ) ],
         verbatim => 1,
     },
+    html => {
+        code     => \&html_filter,
+        requires => [ qw( Syntax::Highlight::HTML ) ],
+        verbatim => 1,
+    },
 );
 
 # automatically register built-in handlers
@@ -40,7 +45,7 @@ sub add {
     for my $lang ( keys %args ) {
         my $nok = 0;
         if( exists $args{$lang}{requires} ) {
-            for ( @{ $builtin{$lang}{requires} } ) {
+            for ( @{ $args{$lang}{requires} } ) {
                 eval "require $_;";
                 if ($@) {
                     $nok++;
@@ -49,6 +54,9 @@ sub add {
                 }
             }
         }
+        croak "$lang: no code parameter given"
+          unless exists $args{$lang}{code};
+
         $filter{$lang} = $args{$lang} unless $nok;
     }
 }
@@ -91,10 +99,9 @@ sub view_begin {
         if( exists $filter{$lang} ) {
             my $output;
             if( $filter{$lang}{verbatim} ) {
-                my @content = ( $begin->content() );
                 $output =
                   $filter{$lang}{code}
-                  ->( join( "\n\n", map { $_->text } @content ), $opts );
+                  ->( join( "\n\n", map { $_->text } $begin->content), $opts );
             }
             else {
                 push @{$self->{FILTER}}, [ $lang, $opts ];
@@ -150,6 +157,15 @@ sub perl_filter {
     $output =~ s/^/$ws/gm;        # put the indentation back
 
     return "<pre>$output</pre>\n";
+}
+
+# HTML highlighting thanks to Syntax::Highlight::HTML
+my $html_filter_parser;
+sub html_filter {
+    my ($code, $opts) = (@_, "");
+
+    $html_filter_parser ||= Syntax::Highlight::HTML->new;
+    return $html_filter_parser->parse( $code )
 }
 
 1;
@@ -311,6 +327,13 @@ Perl::Tidy.
 It accepts options to Perl::Tidy, such as C<-nnn> to number lines of
 code. Check Perl::Tidy's documentation for more information about
 those options.
+
+=item html_filter
+
+This filter does HTML syntax highlighting with the help of
+Syntax::Highlight::HTML.
+
+This filter has no options yet.
 
 =back
 
