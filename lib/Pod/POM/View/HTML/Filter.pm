@@ -138,7 +138,7 @@ sub view_begin {
                 $lang = exists $filter{$lang} ? $lang : 'default';
 
                 $block->[0] = $filter{$lang}{code}->( $block->[0], $opts );
-                $verbatim   = $filter{lang}{verbatim};
+                $verbatim   = $filter{$lang}{verbatim};
             }
 
             # the enclosing tags depend on the block and the last filter
@@ -151,7 +151,7 @@ sub view_begin {
         }
 
         # the tags depend on the last filter only
-        return join $/, @blocks;
+        return join '', @blocks;
     }
 
     # fall-through
