@@ -7,10 +7,7 @@ use strict;
 use Carp;
 
 our $VERSION = '0.05';
-our $default = {
-    code     => sub { '<pre>' . $_[0] . '</pre>' },
-    verbatim => 1,
-};
+our $default = { code     => sub { '<pre>' . $_[0] . '</pre>' } };
 
 my %filter;
 my %builtin = (
@@ -106,102 +103,35 @@ sub view_begin {
         return $self->SUPER::view_begin( $begin );
     }
     elsif( $format eq 'filter' ) {
-        my ($lang, $opts) = split(' ', $args, 2);
-        $lang = exists $filter{$lang} ? $lang : 'default';
+        my @filters = split /\|/, $args;
         my $output;
-        if( $filter{$lang}{verbatim} ) {
-            $HTML_PROTECT++;
-            $output =
-              $filter{$lang}{code}
-              ->( join( "\n\n", map { $_->text } $begin->content), $opts );
-            $HTML_PROTECT--;
+
+        # fetch the whole begin section content
+        for( @{ $begin->content } ) {
+            $output .= $_->text() . "\n\n"
+              if ( $_->type eq 'verbatim' );
+    
+            $output .= "$_", $output =~ s{^<p>|</p>$}{}gm
+              if ( $_->type eq 'text' );
         }
-        else {
-            push @{$self->{FILTER}}, [ $lang, $opts ];
-            $output = $begin->content->present($self);
-            pop @{$self->{FILTER}};
+
+        # now pass it though the filter list
+        my $verbatim;
+        for(@filters) {
+            my ($lang, $opts) = split(' ', $_, 2);
+            $lang = exists $filter{$lang} ? $lang : 'default';
+
+            $output   = $filter{$lang}{code}->( $output, $opts );
+            $verbatim = $filter{lang}{verbatim};
         }
-        return $output;
+
+        # the tags depend on the last filter only
+        return
+          sprintf( ( $verbatim ? '<pre>%s</pre>' : '<p>%s</p>' ), $output );
     }
+
     # fall-through
     return '';
-}
-
-sub view_textblock {
-    my ($self, $text) = @_;
-    if( $self->{FILTER}[-1] ) {
-        $text = $filter{ $self->{FILTER}[-1][0] }{code}
-                ->( $text, $self->{FILTER}[-1][1] );
-    }
-    return "<p>$text</p>\n";
-}
-
-sub view_verbatim {
-    my ($self, $text) = @_;
-    
-    if( $self->{FILTER}[-1] ) {
-        $text = $filter{$self->{FILTER}[-1][0]}{code}
-                ->($text, $self->{FILTER}[-1][1]);
-    }
-    else { # default
-        return $self->SUPER::view_verbatim( $text );
-    }
-    return "<pre>$text</pre>\n\n";
-}
-
-# mostly taken from Pod::POM::View::HTML
-# because it's a closure around the syntactical $HTML_PROTECT
-
-# this code has been borrowed from Pod::Html
-my $urls = '(' . join ('|',
-     qw{
-       http
-       telnet
-       mailto
-       news
-       gopher
-       file
-       wais
-       ftp
-     } ) . ')';
-my $ltrs = '\w';
-my $gunk = '/#~:.?+=&%@!\-';
-my $punc = '.:!?\-;';
-my $any  = "${ltrs}${gunk}${punc}";
-
-sub view_seq_text {
-     my ($self, $text) = @_;
-
-     unless ($HTML_PROTECT) {
-        for ($text) {
-            s/&/&amp;/g;
-            s/</&lt;/g;
-            s/>/&gt;/g;
-        }
-     }
-
-     $text =~ s{
-        \b                           # start at word boundary
-         (                           # begin $1  {
-           $urls     :               # need resource and a colon
-          (?!:)                     # Ignore File::, among others.
-           [$any] +?                 # followed by one or more of any valid
-                                     #   character, but be conservative and
-                                     #   take only what you need to....
-         )                           # end   $1  }
-         (?=                         # look-ahead non-consumptive assertion
-                 [$punc]*            # either 0 or more punctuation followed
-                 (?:                 #   followed
-                     [^$any]         #   by a non-url char
-                     |               #   or
-                     $               #   end of the string
-                 )                   #
-             |                       # or else
-                 $                   #   then end of the string
-         )
-       }{<a href="$1">$1</a>}igox;
-
-     return $text;
 }
 
 # perl highlighting, thanks to Perl::Tidy
