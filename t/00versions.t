@@ -7,6 +7,7 @@ for my $module ( qw(
     Pod::POM
     Perl::Tidy
     Syntax::Highlight::HTML
+    Syntax::Highlight::Shell
 ) ) {
     eval "require $module;";
     diag $@ ? "$module not installed"

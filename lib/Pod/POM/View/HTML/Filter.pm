@@ -6,12 +6,11 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our $default = {
-        code     => sub { '<pre>' . $_[0] . '</pre>' },
-                verbatim => 1,
-                    };
-
+    code     => sub { '<pre>' . $_[0] . '</pre>' },
+    verbatim => 1,
+};
 
 my %filter;
 my %builtin = (
@@ -24,6 +23,11 @@ my %builtin = (
     html => {
         code     => \&html_filter,
         requires => [qw( Syntax::Highlight::HTML )],
+        verbatim => 1,
+    },
+    shell => {
+        code     => \&shell_filter,
+        requires => [qw( Syntax::Highlight::Shell )],
         verbatim => 1,
     },
 );
@@ -229,13 +233,24 @@ sub perl_filter {
     return "<pre>$output</pre>\n";
 }
 
+# a cache for multiple parsers with the same options
+my %filter_parser;
+
 # HTML highlighting thanks to Syntax::Highlight::HTML
-my %html_filter_parser;
 sub html_filter {
     my ($code, $opts) = ( shift, shift || "" );
 
-    my $parser = $html_filter_parser{$opts}
+    my $parser = $filter_parser{html}{$opts}
       ||= Syntax::Highlight::HTML->new( map { (split /=/) } split ' ', $opts );
+    return $parser->parse($code);
+}
+
+# Shell highlighting thanks to Syntax::Highlight::Shell
+sub shell_filter {
+    my ($code, $opts) = ( shift, shift || "" );
+
+    my $parser = $filter_parser{shell}{$opts}
+      ||= Syntax::Highlight::Shell->new( map { (split /=/) } split ' ', $opts );
     return $parser->parse($code);
 }
 
@@ -452,6 +467,22 @@ The filter supports Syntax::Highlight::HTML options:
 
 See Syntax::Highlight::HTML for the list of supported options.
 
+=item shell_filter
+
+This filter does shell script syntax highlighting with the help of
+Syntax::Highlight::Shell.
+
+The filter supports Syntax::Highlight::Shell options:
+
+    =begin filter shell nnn=1
+
+        #!/bin/sh
+        echo "This is a foo test" | sed -e 's/foo/shell/'
+
+    =end filter
+
+See Syntax::Highlight::Shell for the list of supported options.
+
 =back
 
 =head1 WRITING YOUR OWN FILTERS
@@ -522,14 +553,29 @@ Here are the styles used by Perl::Tidy:
 
 Syntax::Highlight::HTML defines the following styles:
 
-    h-decl   declaration      # declaration <!DOCTYPE ...>
-    h-pi     process          # process instruction <?xml ...?>
-    h-com    comment          # comment <!-- ... -->
-    h-ab     angle_bracket    # the characters '<' and '>' as tag delimiters
-    h-tag    tag_name         # the tag name of an element
-    h-attr   attr_name        # the attribute name
-    h-attv   attr_value       # the attribute value
-    h-ent    entity           # any entities: &eacute; &#171;
+    h-decl   declaration    # declaration <!DOCTYPE ...>
+    h-pi     process        # process instruction <?xml ...?>
+    h-com    comment        # comment <!-- ... -->
+    h-ab     angle_bracket  # the characters '<' and '>' as tag delimiters
+    h-tag    tag_name       # the tag name of an element
+    h-attr   attr_name      # the attribute name
+    h-attv   attr_value     # the attribute value
+    h-ent    entity         # any entities: &eacute; &#171;
+
+=head2 C<shell> filter
+
+Syntax::Highlight::Shell defines the following styles:
+
+    s-key                   # shell keywords (like if, for, while, do...)
+    s-blt                   # the builtins commands
+    s-cmd                   # the external commands
+    s-arg                   # the command arguments
+    s-mta                   # shell metacharacters (|, >, \, &)
+    s-quo                   # the single (') and double (") quotes
+    s-var                   # expanded variables: $VARIABLE
+    s-avr                   # assigned variables: VARIABLE=value
+    s-val                   # shell values (inside quotes)
+    s-cmt                   # shell comments
 
 =head1 AUTHOR
 
