@@ -88,23 +88,6 @@ my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
       item<span class="h-ab">&lt;/</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>
 <span class="h-ab">&lt;/</span><span class="h-tag">ul</span><span class="h-ab">&gt;</span></pre>
 </body></html>
-===
-=begin filter html nnn=1
-
-<p>line 1</p>
-    <p>line 2</p>
-
-    <p>line 4</p>
-
-=end filter
----
-<html><body bgcolor="#ffffff">
-<pre>
-<span class="h-lno">  1</span> <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 1<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-lno">  2</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 2<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-lno">  3</span> 
-<span class="h-lno">  4</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
-</body></html>
 TESTS
 
 my @tests2 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
@@ -129,8 +112,26 @@ my @tests2 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>End<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 TESTS
+my @tests3 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
+=begin filter html nnn=1
 
-plan tests => @tests + 2 * @tests2;
+<p>line 1</p>
+    <p>line 2</p>
+
+    <p>line 4</p>
+
+=end filter
+---
+<html><body bgcolor="#ffffff">
+<pre>
+<span class="h-lno">  1</span> <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 1<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  2</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 2<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  3</span> 
+<span class="h-lno">  4</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
+</body></html>
+TESTS
+
+plan tests => @tests + 2 * @tests2 + @tests3;
 
 my $parser = Pod::POM->new;
 for ( @tests ) {
@@ -143,5 +144,15 @@ for ( @tests2 ) {
     my $pom = $parser->parse_text( $_->[0] ) || diag $parser->error;
     is( "$pom", $_->[1], "Correct output the first time" );
     is( "$pom", $_->[1], "Correct output the second time around" );
+}
+
+# test the numbering option
+SKIP: {
+    skip "Syntax::Highlight::HTML version 0.02 required", scalar @tests3
+        unless $Syntax::Highlight::HTML::VERSION >= '0.02';
+    for ( @tests3 ) {
+        my $pom = $parser->parse_text( $_->[0] ) || diag $parser->error;
+        is( "$pom", $_->[1], "Correct output" );
+    }
 }
 
