@@ -3,24 +3,23 @@ use base 'Pod::POM::View::HTML';
 
 use warnings;
 use strict;
+use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %filter;
-my %prereq = (
-    perl => [ qw( Perl::Tidy ) ],
+my %builtin = (
+    perl => {
+        code     => \&perl_filter,
+        requires => [ qw( Perl::Tidy ) ],
+        verbatim => 1,
+    },
 );
 
 # automatically register built-in handlers
-for my $lang ( keys %prereq ) {
-    my $nok = 0;
-    for ( @{ $prereq{$lang} } ) {
-        eval "require $_;";
-        $nok++ if $@;
-    }
-    no strict 'refs';
-    $filter{$lang} = \&{"${lang}_filter"} unless $nok;
-}
+my $INIT = 1;
+add( "PPVHF", %builtin );
+$INIT = 0;
 
 #
 # Specific methods
@@ -38,7 +37,20 @@ sub new {
 
 sub add {
     my ($class, %args) = @_;
-    $filter{$_} = $args{$_} for keys %args;
+    for my $lang ( keys %args ) {
+        my $nok = 0;
+        if( exists $args{$lang}{requires} ) {
+            for ( @{ $builtin{$lang}{requires} } ) {
+                eval "require $_;";
+                if ($@) {
+                    $nok++;
+                    carp "$lang: pre-requisite $_ could not be loaded"
+                      unless $INIT;    # don't warn for built-ins
+                }
+            }
+        }
+        $filter{$lang} = $args{$lang} unless $nok;
+    }
 }
 
 sub know {
@@ -59,7 +71,7 @@ sub view_for {
     if ( $format =~ /^filter\b/ ) {
         my $lang = (split '=', $format)[1];
         if( exists $filter{$lang} ) {
-            return $filter{$lang}->( $for->text, "" ) . "\n\n";
+            return $filter{$lang}{code}->( $for->text, "" ) . "\n\n";
         }
         else { warn "$lang not supported in =for filter"; }
     }
@@ -77,9 +89,18 @@ sub view_begin {
     elsif( $format eq 'filter' ) {
         my ($lang, $opts) = split(' ', $args, 2);
         if( exists $filter{$lang} ) {
-            push @{$self->{FILTER}}, [ $lang, $opts ];
-            my $output = $begin->content->present($self);
-            pop @{$self->{FILTER}};
+            my $output;
+            if( $filter{$lang}{verbatim} ) {
+                my @content = ( $begin->content() );
+                $output =
+                  $filter{$lang}{code}
+                  ->( join( "\n\n", map { $_->text } @content ), $opts );
+            }
+            else {
+                push @{$self->{FILTER}}, [ $lang, $opts ];
+                $output = $begin->content->present($self);
+                pop @{$self->{FILTER}};
+            }
             return $output;
         }
         else { warn "$lang not supported in =begin filter"; }
@@ -91,8 +112,8 @@ sub view_begin {
 sub view_textblock {
     my ($self, $text) = @_;
     if( $self->{FILTER}[-1] ) {
-        $text = $filter{$self->{FILTER}[-1][0]}->($text,
-                                                  $self->{FILTER}[-1][1]);
+        $text = $filter{ $self->{FILTER}[-1][0] }{code}
+                ->( $text, $self->{FILTER}[-1][1] );
     }
     return "<p>$text</p>\n";
 }
@@ -101,8 +122,8 @@ sub view_verbatim {
     my ($self, $text) = @_;
     
     if( $self->{FILTER}[-1] ) {
-        $text = $filter{$self->{FILTER}[-1][0]}->($text,
-                                                  $self->{FILTER}[-1][1]);
+        $text = $filter{$self->{FILTER}[-1][0]}{code}
+                ->($text, $self->{FILTER}[-1][1]);
     }
     else { # default
         return $self->SUPER::view_verbatim( $text );
@@ -128,7 +149,7 @@ sub perl_filter {
     $output =~ s!\n</pre>\n\z!!m; #             and "\n</pre>\n"
     $output =~ s/^/$ws/gm;        # put the indentation back
 
-    return $output;
+    return "<pre>$output</pre>\n";
 }
 
 1;
@@ -167,7 +188,12 @@ In your Pod:
 In your code:
 
     my $view = Pod::POM::View::HTML::Filter->new;
-    $view->add( foo => sub { my $s = shift; $s =~ s/foo/bar/gm; $s } );
+    $view->add(
+        foo => {
+            code => sub { my $s = shift; $s =~ s/foo/bar/gm; $s },
+            # other options are available
+        }
+    );
 
     my $pom = Pod::POM->parse_file( '/my/pod/file' );
     $pom->present($view);
@@ -200,13 +226,27 @@ The following methods are available:
 
 =over 4
 
-=item add( lang => $coderef, ... )
+=item add( lang => { options }, ... )
 
-Add support for one or more languages.
+Add support for one or more languages. Options are passed in a hash
+reference.
 
-The code reference must take a string as its only argument and return
-the formatted HTML string (coloured accordingly to the language grammar,
-hopefully).
+The required C<code> option is a reference to the filter routine. The
+filter must take a string as its only argument and return the formatted
+HTML string (coloured accordingly to the language grammar, hopefully).
+
+Available options are:
+
+    Name       Type       Content
+    ----       ----       -------
+
+    code       CODEREF    filter implementation
+
+    verbatim   BOOLEAN    if true, force the full content of the
+                          =begin/=end block to be passed verbatim
+                          to the filter
+
+    requires   ARRAYREF   list of required modules for this filter
 
 Note that C<add()> is a class method.
 
@@ -317,7 +357,10 @@ string.
 The filter is then added to Pod::POM::View::HTML::Filter with the
 add() method:
 
-    $view->add( \&foo_filter );
+    $view->add( foo => {
+        code     => \&foo_filter,
+        requires => [],
+    );
 
 When presenting the following piece of pod,
 
