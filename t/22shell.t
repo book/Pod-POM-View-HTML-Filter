@@ -5,6 +5,8 @@ use Pod::POM::View::HTML::Filter;
 
 plan skip_all => "Don't know shell"
   unless Pod::POM::View::HTML::Filter->know( 'shell' );
+plan skip_all => "Syntax::Highlight::Shell 0.02 required"
+  unless $Syntax::Highlight::Shell::VERSION >= '0.02';
 
 $Pod::POM::DEFAULT_VIEW = Pod::POM::View::HTML::Filter->new;
 
