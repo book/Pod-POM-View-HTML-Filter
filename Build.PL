@@ -8,11 +8,12 @@ my $builder = Module::Build->new(
     dist_version_from  => 'lib/Pod/POM/View/HTML/Filter.pm',
     requires           => {
         'Test::More' => 0,
-        'Pod::POM'   => '0.17'
+        'Pod::POM'   => '0.17',
     },
     recommends         => {
-        'Perl::Tidy'              => '20031021',
-        'Syntax::Highlight::HTML' => 0,
+        'Perl::Tidy'               => '20031021',
+        'Syntax::Highlight::HTML'  => '0.02',
+        'Syntax::Highlight::Shell' => '0.02',
     },
     license            => 'perl',
     add_to_cleanup     => ['Pod-POM-View-HTML-Filter-*'],
