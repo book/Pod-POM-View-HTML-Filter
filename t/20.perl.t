@@ -1,26 +1,46 @@
 use Test::More;
 use strict;
 use Pod::POM;
-use Pod::POM::View::HTML::Syntax;
+use Pod::POM::View::HTML::Filter;
 
 plan skip_all => "Perl::Tidy not installed"
-  unless Pod::POM::View::HTML::Syntax->know( 'perl' );
+  unless Pod::POM::View::HTML::Filter->know( 'perl' );
 
-$Pod::POM::DEFAULT_VIEW = 'Pod::POM::View::HTML::Syntax';
+$Pod::POM::DEFAULT_VIEW = Pod::POM::View::HTML::Filter->new;
 
 my @tests = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
-=begin syntax perl
+=for filter=perl $A++; # this works too
+---
+<html><body bgcolor="#ffffff">
+<p>
+<span class="q">&lt;p&gt;</span>
+<span class="i">$A</span>++<span class="sc">;</span> <span class="c"># this works too</span>
+</p>
+</body></html>
+===
+=begin filter perl
 
-    # now in full colour!
+# now in full colour!
+$A++;
+
+=end filter
+---
+<html><body bgcolor="#ffffff">
+<span class="c"># now in full colour!</span>
+<span class="i">$A</span>++<span class="sc">;</span>
+</body></html>
+===
+=begin filter perl
+
+    # now in verbatim
     $A++;
 
-=end syntax
+=end filter
 ---
-foo
-===
-=for syntax=perl $A++; # this works too
----
-bar
+<html><body bgcolor="#ffffff">
+<pre>    <span class="c"># now in verbatim</span>
+    <span class="i">$A</span>++<span class="sc">;</span></pre>
+</body></html>
 TESTS
 
 plan tests => scalar @tests;
