@@ -327,7 +327,7 @@ In your code:
 
 =head1 DESCRIPTION
 
-This module is a subclass of Pod::POM::View::HTML that support the
+This module is a subclass of C<Pod::POM::View::HTML> that support the
 C<filter> extension. This can be used in C<=begin> / C<=end> and
 C<=for> pod blocks.
 
@@ -344,13 +344,13 @@ or
     $pom->present;
 
 Even though the module was specifically designed
-for use with Perl::Tidy, you can write your own filters quite
+for use with C<Perl::Tidy>, you can write your own filters quite
 easily (see L<Writing your own filters>).
 
 =head1 FILTERING POD?
 
 The whole idea of this module is to take advantage of all the syntax
-colouring modules that exist (actually, Perl::Tidy was my first target)
+colouring modules that exist (actually, C<Perl::Tidy> was my first target)
 to produce colourful code examples in a POD document (after conversion
 to HTML).
 
@@ -668,7 +668,7 @@ Don't be surprised when you read the result:
 
 The filter was actually called twice, starting at C<2>, just like requested.
 
-Future versions of Pod::POM::View::HTML::Filter I<may> support
+Future versions of C<Pod::POM::View::HTML::Filter> I<may> support
 C<init>, C<begin> and C<end> callbacks to run filter initialisation and
 clean up code.
 
@@ -718,8 +718,8 @@ Return true if the view knows how to handle language C<$lang>.
 
 =head2 Overloaded methods
 
-The following Pod::POM::View::HTML methods are overridden in
-Pod::POM::View::HTML::Filter:
+The following C<Pod::POM::View::HTML> methods are overridden in
+C<Pod::POM::View::HTML::Filter>:
 
 =over 4
 
@@ -727,7 +727,7 @@ Pod::POM::View::HTML::Filter:
 
 The overloaded constructor initialises some internal structures.
 This means that you'll have to use a instance of the class as a
-view for your Pod::POM object. Therefore you must use C<new>.
+view for your C<Pod::POM> object. Therefore you must use C<new>.
 
     $Pod::POM::DEFAULT_VIEW = 'Pod::POM::View::HTML::Filter'; # WRONG
     $pom->present( 'Pod::POM::View::HTML::Filter' );          # WRONG
@@ -751,14 +751,14 @@ These are the methods that support the C<filter> format.
 
 =head2 Built-in filters
 
-Pod::POM::View::HTML::Filter is shipped with a few built-in filters.
+C<Pod::POM::View::HTML::Filter> is shipped with a few built-in filters.
 
 =over 4
 
 =item default
 
 This filter is called when the required filter is not known by
-Pod::POM::View::HTML::Filter. It does nothing more than normal POD
+C<Pod::POM::View::HTML::Filter>. It does nothing more than normal POD
 processing (POD escapes for text paragraphs and C<< <pre> >> for
 verbatim paragraphs.
 
@@ -774,18 +774,18 @@ and set all existing filters back to default.
 =item perl_filter
 
 This filter does Perl syntax highlighting with a lot of help from
-Perl::Tidy.
+C<Perl::Tidy>.
 
-It accepts options to Perl::Tidy, such as C<-nnn> to number lines of
-code. Check Perl::Tidy's documentation for more information about
+It accepts options to C<Perl::Tidy>, such as C<-nnn> to number lines of
+code. Check C<Perl::Tidy>'s documentation for more information about
 those options.
 
 =item html_filter
 
 This filter does HTML syntax highlighting with the help of
-Syntax::Highlight::HTML.
+C<Syntax::Highlight::HTML>.
 
-The filter supports Syntax::Highlight::HTML options:
+The filter supports C<Syntax::Highlight::HTML> options:
 
     =begin filter html nnn=1
 
@@ -794,14 +794,14 @@ The filter supports Syntax::Highlight::HTML options:
 
     =end filter
 
-See Syntax::Highlight::HTML for the list of supported options.
+See C<Syntax::Highlight::HTML> for the list of supported options.
 
 =item shell_filter
 
 This filter does shell script syntax highlighting with the help of
-Syntax::Highlight::Shell.
+C<Syntax::Highlight::Shell>.
 
-The filter supports Syntax::Highlight::Shell options:
+The filter supports C<Syntax::Highlight::Shell> options:
 
     =begin filter shell nnn=1
 
@@ -810,7 +810,7 @@ The filter supports Syntax::Highlight::Shell options:
 
     =end filter
 
-See Syntax::Highlight::Shell for the list of supported options.
+See C<Syntax::Highlight::Shell> for the list of supported options.
 
 =back
 
@@ -820,7 +820,7 @@ Write a filter is quite easy: a filter is a subroutine that takes two
 arguments (text to parse and option string) and returns the filtered
 string.
 
-The filter is added to Pod::POM::View::HTML::Filter's internal filter
+The filter is added to C<Pod::POM::View::HTML::Filter>'s internal filter
 list with the C<add()> method:
 
     $view->add(
@@ -860,11 +860,11 @@ favourite colours in a custom CSS file.
 
 =head2 C<perl> filter
 
-Perl::Tidy's HTML code looks like:
+C<Perl::Tidy>'s HTML code looks like:
 
     <span class="i">$A</span>++<span class="sc">;</span>
 
-Here are the styles used by Perl::Tidy:
+Here are the styles used by C<Perl::Tidy>:
 
     n        numeric
     p        paren
@@ -887,7 +887,7 @@ Here are the styles used by Perl::Tidy:
 
 =head2 C<html> filter
 
-Syntax::Highlight::HTML makes use of the following styles:
+C<Syntax::Highlight::HTML> makes use of the following styles:
 
     h-decl   declaration    # declaration <!DOCTYPE ...>
     h-pi     process        # process instruction <?xml ...?>
@@ -900,7 +900,7 @@ Syntax::Highlight::HTML makes use of the following styles:
 
 =head2 C<shell> filter
 
-Syntax::Highlight::Shell makes use of the following styles:
+C<Syntax::Highlight::Shell> makes use of the following styles:
 
     s-key                   # shell keywords (like if, for, while, do...)
     s-blt                   # the builtins commands
@@ -929,8 +929,8 @@ Philippe "BooK" Bruhat, C<< <book@cpan.org> >>
 =head1 THANKS
 
 Many thanks to Sébastien Aperghis-Tramoni (Maddingue), who helped
-debugging the module and wrote Syntax::Highlight::HTML and
-Syntax::Highlight::Shell so that I could ship PPVHF with more than
+debugging the module and wrote C<Syntax::Highlight::HTML> and
+C<Syntax::Highlight::Shell> so that I could ship PPVHF with more than
 one filter.
 
 Perl code examples where borrowed in Amelia,
