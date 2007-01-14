@@ -39,7 +39,7 @@ for my $file (@pods) {
 
 # compute the total number of tests
 my $tests;
-$tests += scalar keys %$_ for values %result;
+$tests += $_ for map { /\+/ ? 2 : 1 } map { keys %$_ } values %result;
 plan tests => $tests;
 
 # run the tests for all files
@@ -64,13 +64,33 @@ for my $file ( sort keys %result ) {
             }
 
             # create the POM
-            my $pom = Pod::POM->new()->parse_text($pod{$file});
+            my $pom = Pod::POM->new()->parse_text( $pod{$file} );
 
             # compare the results
-            is( $view->print( $pom ),
+            is( $view->print($pom),
                 $result{$file}{$format},
                 "$file <$format>"
             );
+
+            # test a duplicate run on the same $pom/$view pair
+            if ( $format =~ /\+/ ) {
+            TODO:
+                if ( $format =~ /\+perl/ ) {
+
+                    # this fails only with the Perl::Tidy plugin
+                    local $TODO = "BUG: lost part of the Pod::POM structure";
+                    is( $view->print($pom),
+                        $result{$file}{$format},
+                        "$file <$format> (2nd run)"
+                    );
+                }
+                else {
+                    is( $view->print($pom),
+                        $result{$file}{$format},
+                        "$file <$format> (2nd run)"
+                    );
+                }
+            }
         }
     }
 }
