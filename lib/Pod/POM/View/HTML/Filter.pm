@@ -7,7 +7,15 @@ use strict;
 use Carp;
 
 our $VERSION = '0.06';
-our $default = { code     => sub { $_[0] } };
+our $default = {
+    code => sub {
+        my $s = shift;
+        $s =~ s/&/&amp;/g;
+        $s =~ s/</&lt;/g;
+        $s =~ s/>/&gt;/g;
+        $s;
+        }
+};
 
 my %filter;
 my %builtin = (
