@@ -12,6 +12,8 @@ Revision history for Pod-POM-View-HTML-Filter
         - blocks are now automatically unindented before processing,
           but it's possible to prevent this (at your own risks) with
           auto_unindent => 0 in the constructor
+        - HTML characters '&', '<' and '>' are now escaped in the default
+          filter
 
 0.05 Thu Oct 14 11:44:14 CEST 2004
         [FEATURES]
