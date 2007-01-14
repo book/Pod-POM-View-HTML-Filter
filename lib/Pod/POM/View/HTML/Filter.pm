@@ -41,16 +41,12 @@ $INIT = 0;
 #
 sub new {
     my $class = shift;
-    my $self = $class->SUPER::new(@_)
-        || return;
-
-    # instance filters
-    $self->{filter} = {};
-
-    # initalise stack for maintaining info for filters
-    $self->{ FILTER } = [];
-
-    return $self;
+    return $class->SUPER::new(
+        auto_unindent => 1,
+        @_,
+        filter => {},    # instance filters
+        FILTER => [],    # stack maintaining info for filters
+    );
 }
 
 sub add {
@@ -159,6 +155,7 @@ sub view_begin {
 
         # fetch the text and verbatim blocks in the begin section
         # and remember the type of each block
+        # (we owe this to Pod::POM's bug with begin blocks)
         my $prev = '';
         my @blocks;
         for( @{ $begin->content } ) {
@@ -189,8 +186,12 @@ sub view_begin {
                 my ( $lang, $opts ) = split( ' ', $f, 2 );
                 $lang = exists $filter->{$lang} ? $lang : 'default';
 
+                ( my $indent, $block->[0] ) = _unindent( $block->[0] )
+                    if $self->{auto_unindent};
                 $block->[0] = $filter->{$lang}{code}->( $block->[0], $opts );
                 $verbatim   = $filter->{$lang}{verbatim};
+                ( $block->[0] ) =~ s/^/$indent/gm
+                    if $self->{auto_unindent};
             }
 
             # the enclosing tags depend on the block and the last filter
@@ -243,8 +244,6 @@ sub _unindent {
 sub perl_filter {
     my ($code, $opts) = ( shift, shift || "" );
     my $output = "";
-    my ($ws) = $code =~ /^(\s*)/; # count the blanks on the first line
-    $code =~ s/^$ws//gm;          # remove them
 
     # Perl::Tidy 20031021 uses Getopt::Long and expects the default config
     # this is a workaround (a patch was sent to Perl::Tidy's author)
@@ -259,7 +258,6 @@ sub perl_filter {
         errorfile   => '-',
     );
     $output = _cleanup( $output ); # remove <pre></pre>
-    $output =~ s/^/$ws/gm;         # put the indentation back
 
     # put back Getopt::Long previous configuration, if needed
     Getopt::Long::Configure( $glc );
