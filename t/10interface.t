@@ -1,32 +1,48 @@
-use Test::More tests => 9;
+use Test::More tests => 22;
 use strict;
 use Pod::POM;
 use Pod::POM::View::HTML::Filter;
 
-my $view = Pod::POM::View::HTML::Filter->new;
+my $class  = 'Pod::POM::View::HTML::Filter';
+my $object = $class->new();
+my @PPVHF  = ( [ $object, 'instance' ], [ $class, 'class' ] );
+my $foo    = {
+    code => sub { my $s = shift; $s =~ s/foo/bar/g; $s }
+};
 
 # no foo built-in
-my @foo_filters = grep { /^foo$/ } $view->filters;
-is( @foo_filters, 0, "No foo filter");
-ok( ! $view->know( 'foo' ), "Don't know foo" );
+for my $PPVHF (@PPVHF) {
+    my @foo_filters = grep {/^foo$/} $PPVHF->[0]->filters();
+    is( @foo_filters, 0, "No foo filter ($PPVHF->[1])" );
+    ok( !$PPVHF->[0]->know('foo'), "Don't know foo ($PPVHF->[1])" );
+}
 
-# test add, know and filters as class methods
-Pod::POM::View::HTML::Filter->add(
-    foo  => { code => sub { my $s = shift; $s =~ s/foo/bar/g; $s } },
-);
-@foo_filters = grep { /^foo$/ } Pod::POM::View::HTML::Filter->filters;
-is( @foo_filters, 1, "There's a foo filter now");
-ok( Pod::POM::View::HTML::Filter->know( 'foo' ), "Hey, I know foo now" );
-ok( ! Pod::POM::View::HTML::Filter->know( 'bar' ), "Don't know bar" );
+for my $PPVHF (@PPVHF) {
 
-# test add, know and filters as instance methods
-$view->add( foo2 => { code => sub { "foo" } } );
-@foo_filters = grep { /^foo/ } $view->filters;
-is( @foo_filters, 2, "There are two foo filters");
-ok( $view->know( 'foo2' ), "Hey, I know foo2 now" );
-ok( ! $view->know( 'bar' ), "Still don't know bar" );
+    # add a filter
+    $PPVHF->[0]->add( foo => $foo );
+    my @foo_filters = grep {/^foo$/} $PPVHF->[0]->filters();
+    is( @foo_filters, 1, "There's a foo filter now ($PPVHF->[1])" );
+    ok( $PPVHF->[0]->know('foo'), "Hey, I know foo now ($PPVHF->[1])" );
+    ok( !$PPVHF->[0]->know('bar'), "Don't know bar ($PPVHF->[1])" );
 
-# test errors
-eval { $view->add( klonk => { verbatim => 1 } ) };
-like( $@, qr/^klonk: no code parameter given/, "code is required for add()" );
+    # add one more
+    $PPVHF->[0]->add( foo2 => { code => sub {"foo"} } );
+    @foo_filters = grep {/^foo/} $PPVHF->[0]->filters();
+    is( @foo_filters, 2, "There are two foo filters ($PPVHF->[1])" );
+    ok( $PPVHF->[0]->know('foo2'), "Hey, I know foo2 now ($PPVHF->[1])" );
+    ok( !$PPVHF->[0]->know('bar'), "Still don't know bar ($PPVHF->[1])" );
+
+    # test delete()
+    is( $PPVHF->[0]->delete('foo'), $foo, "Removed foo ($PPVHF->[1])" );
+    ok( !$PPVHF->[0]->know('foo'), "Don't know foo any more ($PPVHF->[1])" );
+
+    # test errors
+    eval { $PPVHF->[0]->add( klonk => { verbatim => 1 } ) };
+    like(
+        $@,
+        qr/^klonk: no code parameter given/,
+        "code is required for add() ($PPVHF->[1])"
+    );
+}
 
