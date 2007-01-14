@@ -9,6 +9,9 @@ Revision history for Pod-POM-View-HTML-Filter
             and it will DWYM)
           + it's possible to override the class filter for a single
             instance
+        - blocks are now automatically unindented before processing,
+          but it's possible to prevent this (at your own risks) with
+          auto_unindent => 0 in the constructor
 
 0.05 Thu Oct 14 11:44:14 CEST 2004
         [FEATURES]
