@@ -210,12 +210,34 @@ sub view_begin {
     return '';
 }
 
+#
+# utility functions
+#
+
 # a simple filter output cleanup routine
 sub _cleanup {
     local $_ = shift;
     s!\A<pre>\n?|\n?</pre>\n\z!!gm; # remove <pre></pre>
     $_;
 }
+
+sub _unindent {
+    my $str = shift;
+    my $indent;
+    while ( $str =~ /^(\s*)\S/gmc ) {
+        $indent =
+              !defined $indent             ? $1
+            : length($1) < length($indent) ? $1
+            :                                $indent;
+    }
+    $indent ||= '';
+    $str =~ s/^$indent//gm;
+    return ( $indent, $str );
+}
+
+#
+# builtin filters
+#
 
 # perl highlighting, thanks to Perl::Tidy
 sub perl_filter {
