@@ -10,7 +10,8 @@ my %avail = map { $_ => 1 }
     grep { $_ ne 'default' } Pod::POM::View::HTML::Filter->filters();
 
 # all available files
-my @pods = glob( catfile( 't', 'pod', '*.src' ) );
+my $re = @ARGV ? qr/@{[shift]}/ : qr//;
+my @pods = grep { /$re/ } glob( catfile( 't', 'pod', '*.src' ) );
 
 # compute the test data
 my %result;
@@ -48,6 +49,7 @@ for my $file ( sort keys %result ) {
     for my $format ( sort keys %{ $result{$file} } ) {
 
     SKIP: {
+            my $skip = $format =~ /\+/ ? 2 : 1;
 
             # create the view
             my $view = Pod::POM::View::HTML::Filter->new();
@@ -56,7 +58,7 @@ for my $file ( sort keys %result ) {
             while ( $format =~ /([+-])(\w+)/g ) {
 
                 # skip if required filter not here
-                skip "$file <$format> [$2 not available]", 1
+                skip "$file <$format> [$2 not available]", $skip
                     if $1 eq '+' && !$avail{$2};
 
                 # remove unwanted filter
