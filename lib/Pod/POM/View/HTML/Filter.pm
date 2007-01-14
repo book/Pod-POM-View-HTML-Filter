@@ -79,13 +79,28 @@ sub add {
     }
 }
 
+sub delete {
+    my ( $self, $lang ) = @_;
+    my $filter =
+        ref $self
+        && UNIVERSAL::isa( $self, 'Pod::POM::View::HTML::Filter' )
+        ? $self->{filter}
+        : \%filter;
+    my $old = $self->_filter()->{$lang};
+    $filter->{$lang} = undef;
+    return $old;
+}
+
 # return a hashref of current filters for the class|instance
 sub _filter {
     my ($self) = @_;
-    return
-        ref $self && UNIVERSAL::isa( $self, 'Pod::POM::View::HTML::Filter' )
+    my $filter =
+        ref $self
+        && UNIVERSAL::isa( $self, 'Pod::POM::View::HTML::Filter' )
         ? { %filter, %{ $self->{filter} } }
-        : \%filter;
+        : {%filter};
+    $filter->{$_} || delete $filter->{$_} for keys %$filter;
+    return $filter;
 }
 
 sub know {
@@ -723,7 +738,20 @@ Available options are:
 
     requires   ARRAYREF   list of required modules for this filter
 
-Note that C<add()> is a class method.
+Note that C<add()> is both a class and an instance method.
+
+When used as a class method, the new language is immediately available
+for all future and existing instances.
+
+When used as an instance method, the new language is only available for
+the instance itself.
+
+=item C<delete( $lang )>
+
+Remove the given language from the list of class or instance filters.
+The deleted filter is returned by this method.
+
+C<delete()> is both a class and an instance method, just like C<add()>.
 
 =item C<filters()>
 
