@@ -815,6 +815,10 @@ view for your C<Pod::POM> object. Therefore you must use C<new>.
     my $view = Pod::POM::View::HTML::Filter->new;
     $pom->present( $view );
 
+The only option at this time is C<auto_unindent>, which is enabled by
+default. This option remove leading indentation from all verbatim blocks
+within the begin blocks, and put it back after highlighting.
+
 =item C<view_begin()>
 
 =item C<view_for()>
