@@ -1,0 +1,23 @@
+=pod
+
+Pre-text.
+
+=for filter=html <b>bold</b>
+
+Post-text.
+
+__RESULT__
++html
+<html><body bgcolor="#ffffff">
+<p>Pre-text.</p>
+<pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
+<p>Post-text.</p>
+</body></html>
+__RESULT__
+-html
+<html><body bgcolor="#ffffff">
+<p>Pre-text.</p>
+&lt;b&gt;bold&lt;/b&gt;
+
+<p>Post-text.</p>
+</body></html>
