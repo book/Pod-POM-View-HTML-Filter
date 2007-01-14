@@ -1,5 +1,15 @@
 Revision history for Pod-POM-View-HTML-Filter
 
+0.06
+        [ENHANCEMENTS]
+        - add() behaves differently when called on the class or an
+          instance, and updates the appropriate list of filters:
+          + an instance always has access to the latest class filters (so
+            you can update the class with add() after creating an object
+            and it will DWYM)
+          + it's possible to override the class filter for a single
+            instance
+
 0.05 Thu Oct 14 11:44:14 CEST 2004
         [FEATURES]
         - support stacking filters by using the | notation
