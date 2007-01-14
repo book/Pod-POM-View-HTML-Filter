@@ -479,6 +479,15 @@ will return C<bar ba! baz>.
 
 =head2 A note on verbatim and text blocks
 
+B<Note:> The fact that I mention I<verbatim> and I<paragraph> in
+this section is due to an old bug in C<Pod::POM>, which parses the
+content of C<begin>/C<end> sections as the usual POD paragraph
+and verbatim blocks. This is a bug in C<Pod::POM>, around which
+C<Pod::POM::View::HTML::Filter> tries to work around. The best
+way to work around this bug in POD documents you want to present
+with C<Pod::POM::View::HTML::Filter> is to always indent your
+C<=begin filter> section with a fixed number of space characters.
+
 Verbatim paragraphs are catenated together to form a single block
 of text, that is passed to the filter. Text paragraphs can contain
 POD escape sequences, such as C<BE<lt>...E<gt>>.
