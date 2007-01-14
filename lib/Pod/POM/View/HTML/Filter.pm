@@ -198,7 +198,7 @@ sub view_begin {
                     if $self->{auto_unindent};
                 $block->[0] = $filter->{$lang}{code}->( $block->[0], $opts );
                 $verbatim   = $filter->{$lang}{verbatim};
-                ( $block->[0] ) =~ s/^/$indent/gm
+                ( $block->[0] ) =~ s/^(?=.+)/$indent/gm
                     if $self->{auto_unindent};
             }
 
