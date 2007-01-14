@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our $default = { code     => sub { $_[0] } };
 
 my %filter;
@@ -44,6 +44,9 @@ sub new {
     my $self = $class->SUPER::new(@_)
         || return;
 
+    # instance filters
+    $self->{filter} = {};
+
     # initalise stack for maintaining info for filters
     $self->{ FILTER } = [];
 
@@ -51,7 +54,12 @@ sub new {
 }
 
 sub add {
-    my ($class, %args) = @_;
+    my ($self, %args) = @_;
+    my $filter = ref $self
+        && UNIVERSAL::isa( $self, 'Pod::POM::View::HTML::Filter' )
+        ? $self->{filter}
+        : \%filter;
+
     for my $lang ( keys %args ) {
         my $nok = 0;
         if( exists $args{$lang}{requires} ) {
@@ -67,16 +75,25 @@ sub add {
         croak "$lang: no code parameter given"
           unless exists $args{$lang}{code};
 
-        $filter{$lang} = $args{$lang} unless $nok;
+        $filter->{$lang} = $args{$lang} unless $nok;
     }
 }
 
-sub know {
-    my ($class, $lang) = @_;
-    return exists $filter{$lang};
+# return a hashref of current filters for the class|instance
+sub _filter {
+    my ($self) = @_;
+    return
+        ref $self && UNIVERSAL::isa( $self, 'Pod::POM::View::HTML::Filter' )
+        ? { %filter, %{ $self->{filter} } }
+        : \%filter;
 }
 
-sub filters { keys %filter; }
+sub know {
+    my ($self, $lang) = @_;
+    return exists $self->_filter()->{$lang};
+}
+
+sub filters { keys %{ $_[0]->_filter() }; }
 
 #
 # overridden Pod::POM::View::HTML methods
@@ -84,6 +101,7 @@ sub filters { keys %filter; }
 sub view_for {
     my ($self, $for)    = @_;
     my $format = $for->format;
+    my $filter = $self->_filter();
 
     return $for->text() . "\n\n" if $format =~ /^html\b/;
 
@@ -98,10 +116,10 @@ sub view_for {
         for my $lang (split /\|/, $args) {
             ( $lang, my $opts ) = ( split( ':', $lang, 2 ), '' );
             $opts =~ y/:/ /;
-            $lang   = exists $filter{$lang} ? $lang : 'default';
+            $lang = exists $filter->{$lang} ? $lang : 'default';
 
-            $output = $filter{$lang}{code}->( $output, "" );
-            $verbatim = $filter{$lang}{verbatim};
+            $output   = $filter->{$lang}{code}->( $output, "" );
+            $verbatim = $filter->{$lang}{verbatim};
         }
         return sprintf(
             ( $verbatim ? "<pre>%s</pre>\n" : "%s\n\n" ),
@@ -116,6 +134,7 @@ sub view_for {
 sub view_begin {
     my ($self, $begin)  = @_;
     my ($format, $args) = split(' ', $begin->format(), 2);
+    my $filter = $self->_filter();
 
     if ( $format eq 'html' ) {
         return $self->SUPER::view_begin( $begin );
@@ -153,10 +172,10 @@ sub view_begin {
             my $verbatim;
             for my $f (@filters) {
                 my ( $lang, $opts ) = split( ' ', $f, 2 );
-                $lang = exists $filter{$lang} ? $lang : 'default';
+                $lang = exists $filter->{$lang} ? $lang : 'default';
 
-                $block->[0] = $filter{$lang}{code}->( $block->[0], $opts );
-                $verbatim   = $filter{$lang}{verbatim};
+                $block->[0] = $filter->{$lang}{code}->( $block->[0], $opts );
+                $verbatim   = $filter->{$lang}{verbatim};
             }
 
             # the enclosing tags depend on the block and the last filter
