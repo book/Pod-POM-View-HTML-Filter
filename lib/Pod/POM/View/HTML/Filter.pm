@@ -139,7 +139,7 @@ sub view_for {
             $verbatim++ if $filter->{$lang}{verbatim};
         }
         return sprintf(
-            ( $verbatim ? "<pre>%s</pre>\n" : "%s\n\n" ),
+            ( $verbatim ? "<pre>%s</pre>\n" : "<p>%s</p>\n\n" ),
             $output
         );
     }
@@ -184,7 +184,7 @@ sub view_begin {
         }
 
         # the enclosing tags depend on the block and the last filter
-        return $verbatim ? "<pre>$text</pre>\n" : "$text\n";
+        return $verbatim ? "<pre>$text</pre>\n" : "<p>$text</p>\n";
     }
 
     # fall-through
