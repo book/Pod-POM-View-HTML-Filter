@@ -7,19 +7,19 @@ use strict;
 use Carp;
 
 our $VERSION = '0.06';
-our $default = {
-    code => sub {
-        my $s = shift;
-        $s =~ s/&/&amp;/g;
-        $s =~ s/</&lt;/g;
-        $s =~ s/>/&gt;/g;
-        $s;
-        }
-};
 
 my %filter;
 my %builtin = (
-    default => $default,
+    default => {
+        code => sub {
+            my $s = shift;
+            $s =~ s/&/&amp;/g;
+            $s =~ s/</&lt;/g;
+            $s =~ s/>/&gt;/g;
+            $s;
+        },
+        verbatim => 1,
+    },
     perl => {
         code     => \&perl_filter,
         requires => [qw( Perl::Tidy )],
