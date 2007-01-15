@@ -19,6 +19,9 @@ Revision history for Pod-POM-View-HTML-Filter
           verbatim block inside the begin block (which it shouldn't do,
           since begin block should be opaque to it... but that's a bug
           in Pod::POM). Otherwise it's enclosed in <p>...</p> tags.
+        - when processing a filter stack, if one of the filters is not
+          available, the whole stack is replaced with the 'default'
+          filter
         [TEST]
         - the main test script (t/20builtins.t) uses the files in
           t/pod/ as test data. Those files contain a pod source, and
