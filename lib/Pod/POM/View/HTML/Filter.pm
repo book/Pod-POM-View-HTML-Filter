@@ -126,22 +126,28 @@ sub view_for {
         my $args   = (split '=', $format, 2)[1];
         return '' unless defined $args; # silently skip
 
-        my $output = $for->text;
+        my $text = $for->text;
         my $verbatim = 0;
 
-        # stacked filters
+        # select the filters and options
+        my @langs;
         for my $lang (split /\|/, $args) {
             ( $lang, my $opts ) = ( split( ':', $lang, 2 ), '' );
             $opts =~ y/:/ /;
             $lang = exists $filter->{$lang} ? $lang : 'default';
-
-            $output   = $filter->{$lang}{code}->( $output, "" );
+            push @langs, [ $lang, $opts ];
             $verbatim++ if $filter->{$lang}{verbatim};
         }
-        return sprintf(
-            ( $verbatim ? "<pre>%s</pre>\n" : "<p>%s</p>\n\n" ),
-            $output
-        );
+
+        # cancel filtering if one filter is missing
+        @langs = ( grep { $_->[0] eq 'default' } @langs )
+            ? ( [ 'default', '' ] )
+            : @langs;
+
+        # process the text
+        $text = $filter->{ $_->[0] }{code}->( $text, $_->[1] ) for @langs;
+
+        return $verbatim ? "<pre>$text</pre>\n" : "<p>$text</p>\n\n";
     }
 
     # fall-through
@@ -170,18 +176,26 @@ sub view_begin {
             $verbatim++ if $item->type() eq 'verbatim';
         }
 
+        # select the filters and options
+        my @langs;
         for my $f (@filters) {
             my ( $lang, $opts ) = split( ' ', $f, 2 );
             $lang = exists $filter->{$lang} ? $lang : 'default';
-
-
-            ( my $indent, $text ) = _unindent( $text )
-                if $self->{auto_unindent};
-            $text = $filter->{$lang}{code}->( $text, $opts );
+            push @langs, [ $lang, $opts ];
             $verbatim++ if $filter->{$lang}{verbatim};
-            $text =~ s/^(?=.+)/$indent/gm
-                if $self->{auto_unindent};
         }
+
+        # cancel filtering if one filter is missing
+        @langs = ( grep { $_->[0] eq 'default' } @langs )
+            ? ( [ 'default', '' ] )
+            : @langs;
+
+        # process the text
+        ( my $indent, $text ) = _unindent($text)
+            if $self->{auto_unindent};
+        $text = $filter->{ $_->[0] }{code}->( $text, $_->[1] ) for @langs;
+        $text =~ s/^(?=.+)/$indent/gm
+            if $self->{auto_unindent};
 
         # the enclosing tags depend on the block and the last filter
         return $verbatim ? "<pre>$text</pre>\n" : "<p>$text</p>\n";
