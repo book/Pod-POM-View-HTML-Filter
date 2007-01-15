@@ -46,12 +46,12 @@ $A++;
 
 =end filter
 EOT
-is( "$pom", << 'EOH', "Default is simply naught (<p>)");
+is( "$pom", << 'EOH', "Default is simply naught (<pre>)");
 <html><body bgcolor="#ffffff">
 <h1>Foo</h1>
 
 <p>The foo filter at work:</p>
-<p>$A++;</p>
+<pre>$A++;</pre>
 </body></html>
 EOH
 
@@ -79,9 +79,7 @@ baz</p>
 EOH
 
 # set it back to default
-Pod::POM::View::HTML::Filter->add(
-    $_ => $Pod::POM::View::HTML::Filter::default
-) for Pod::POM::View::HTML::Filter->filters;
+Pod::POM::View::HTML::Filter->delete('foo');
 
 # check that foo == default
 $pom = $parser->parse_text(<<'EOT') or diag $parser->error;
@@ -95,8 +93,8 @@ EOT
 
 is( "$pom", <<'EOH', "Correct output" );
 <html><body bgcolor="#ffffff">
-<p>bar foo bar
-baz</p>
+<pre>bar foo bar
+baz</pre>
 </body></html>
 EOH
 
