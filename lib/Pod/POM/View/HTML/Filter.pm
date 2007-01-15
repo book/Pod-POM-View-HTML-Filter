@@ -161,56 +161,34 @@ sub view_begin {
 
         # fetch the text and verbatim blocks in the begin section
         # and remember the type of each block
-        # (we owe this to Pod::POM's bug with begin blocks)
         my $prev = '';
-        my @blocks;
-        for( @{ $begin->content } ) {
-            # bare text blocks appear sometimes
-            my $type = ref $_ ? $_->type : 'text';
-
-            # catenate verbatim blocks together
-            push @blocks, [
-              ( $type eq $prev ? (pop @blocks)->[0] . "\n\n" : '' )
-                . $_->text(),
-              $type
-            ] if $type eq 'verbatim';
-
-            # stringification forces Pod::POM to present the $_ data in html
-            push @blocks, [
-              (s{\A<p>|</p>[\n\r]*\z}{}g, $_)[1],
-              $type
-            ] if $type eq 'text'; 
-
-            # remember what we just saw
-            $prev = $type;
+        my $text = '';
+        for my $item ( @{ $begin->content } ) {
+            $text .= ($prev ? "\n\n" :'') . $item->text();
+            $prev = 1;
         }
 
-        # now pass the block list through the filter list
-        for my $block (@blocks) {
-            my $verbatim;
-            for my $f (@filters) {
-                my ( $lang, $opts ) = split( ' ', $f, 2 );
-                $lang = exists $filter->{$lang} ? $lang : 'default';
+        my $verbatim;
+        for my $f (@filters) {
+            my ( $lang, $opts ) = split( ' ', $f, 2 );
+            $lang = exists $filter->{$lang} ? $lang : 'default';
 
-                ( my $indent, $block->[0] ) = _unindent( $block->[0] )
-                    if $self->{auto_unindent};
-                $block->[0] = $filter->{$lang}{code}->( $block->[0], $opts );
-                $verbatim   = $filter->{$lang}{verbatim};
-                ( $block->[0] ) =~ s/^(?=.+)/$indent/gm
-                    if $self->{auto_unindent};
-            }
 
-            # the enclosing tags depend on the block and the last filter
-            $block = sprintf(
-                ( $verbatim || $block->[1] eq 'verbatim'
-                  ? "<pre>%s</pre>\n"
-                  : "<p>%s</p>\n"     ),
-                $block->[0]
-            );
+            ( my $indent, $text ) = _unindent( $text )
+                if $self->{auto_unindent};
+            $text = $filter->{$lang}{code}->( $text, $opts );
+            $verbatim   = $filter->{$lang}{verbatim} || 0;
+            $text =~ s/^(?=.+)/$indent/gm
+                if $self->{auto_unindent};
         }
 
-        # the tags depend on the last filter only
-        return join '', @blocks;
+        # the enclosing tags depend on the block and the last filter
+        return sprintf(
+            ( $verbatim #|| $block->[1] eq 'verbatim'
+              ? "<pre>%s</pre>\n"
+              : "<p>%s</p>\n"     ),
+            $text
+        );
     }
 
     # fall-through
