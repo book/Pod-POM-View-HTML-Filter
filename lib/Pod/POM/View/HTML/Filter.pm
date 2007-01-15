@@ -147,7 +147,7 @@ sub view_for {
         # process the text
         $text = $filter->{ $_->[0] }{code}->( $text, $_->[1] ) for @langs;
 
-        return $verbatim ? "<pre>$text</pre>\n" : "<p>$text</p>\n\n";
+        return $verbatim ? "<pre>$text</pre>\n" : "<p>$text</p>\n";
     }
 
     # fall-through
