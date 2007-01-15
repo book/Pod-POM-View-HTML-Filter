@@ -7,7 +7,6 @@ __RESULT__
 __RESULT__
 -shell
 <html><body bgcolor="#ffffff">
-echo "foo"
-
-
+<pre>echo "foo"
+</pre>
 </body></html>
