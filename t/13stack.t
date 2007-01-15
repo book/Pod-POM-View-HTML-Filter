@@ -13,7 +13,7 @@ bar foo bar
 =end filter
 ---
 <html><body bgcolor="#ffffff">
-<p>ba! bar ba!</p>
+<pre>ba! bar ba!</pre>
 </body></html>
 ===
 =begin filter foo | bang
