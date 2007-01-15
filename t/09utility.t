@@ -40,6 +40,21 @@ glipp crraack aiieee
 zap
 thwape
 EOT
+    [ << 'EOT', '', << 'EOT' ],
+    <!-- a longer piece of HTML -->
+    <p>First paragraph</p>
+
+<p>another para</p>
+
+    <p>End</p>
+EOT
+    <!-- a longer piece of HTML -->
+    <p>First paragraph</p>
+
+<p>another para</p>
+
+    <p>End</p>
+EOT
 );
 
 plan tests => scalar @text;
