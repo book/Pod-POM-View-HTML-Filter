@@ -566,15 +566,16 @@ Which produces the rather unreadable piece of HTML:
 
 =head2 Caveats
 
-There are a few things to keep in mind when mixing verbatim and text paragraphs
-in a C<=begin> block.
+There were a few things to keep in mind when mixing verbatim and text paragraphs
+in a C<=begin> block. These problems do not exist any more as from version
+0.06.
 
 =over 4
 
-=item Text paragraphs are processed for POD escapes
+=item Text paragraphs are not processed for POD escapes any more
 
-Since a text paragraph is preprocessed for POD escape sequences, the
-following block
+Because the C<=begin> / C<=end> block is now processed as a single
+string of text, the following block:
 
     =begin filter html
 
@@ -582,20 +583,20 @@ following block
 
     =end
 
-will be transformed into C< <b>foo</b> > before being passed to the
-filters, which will produce this:
+will not be transformed into C< <b>foo</b> > before being passed to the
+filters, but will produce the expected:
 
-    <pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>foo<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
+    <pre>B<span class="h-ab">&lt;</span><span class="h-tag">foo</span><span class="h-ab">&gt;</span></pre>
 
 =begin html
 
 <p>This will be rendered by your web browser as:</p>
 
-    <pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>foo<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
+    <pre>B<span class="h-ab">&lt;</span><span class="h-tag">foo</span><span class="h-ab">&gt;</span></pre>
 
 =end html
 
-Whereas the same text in a verbatim block
+And the same text in a verbatim block
 
     =begin filter html
     
@@ -603,7 +604,7 @@ Whereas the same text in a verbatim block
 
     =end
 
-will produce:
+will produce the same results.
 
     <pre>    B<span class="h-ab">&lt;</span><span class="h-tag">foo</span><span class="h-ab">&gt;</span></pre>
 
@@ -615,12 +616,12 @@ will produce:
 
 =end html
 
-Not quite the same, isn't it?
+Which looks quite the same, doesn't it?
 
-=item Separate paragraphs are filtered separately
+=item Separate paragraphs aren't filtered separately any more
 
-As seen in L<A note on verbatim and text blocks>, the filter processes
-each verbatim and text paragraph independently. So, if you have a filter
+As seen in L<A note on verbatim and text blocks>, the filter now processes
+the begin block as a single string of text. So, if you have a filter
 that replace each C<*> character with an auto-incremented number in
 square brackets, like this:
 
@@ -645,12 +646,13 @@ And you try to process the following block:
     
     =end filter
 
-Don't be surprised when you read the result:
+You'll get the expected result (contrary to previous versions):
 
-    <p>TIMTOWDI[2], but your library should DWIM[3] when possible.</p>
-    <p>You can't always claims that PICNIC[2], can you?</p>
+    <p>TIMTOWDI[2], but your library should DWIM[3] when possible.
+    
+    You can't always claims that PICNIC[4], can you?</p>
 
-The filter was actually called twice, starting at C<2>, just like requested.
+The filter was really called only once, starting at C<2>, just like requested.
 
 Future versions of C<Pod::POM::View::HTML::Filter> I<may> support
 C<init>, C<begin> and C<end> callbacks to run filter initialisation and
