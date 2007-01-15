@@ -14,8 +14,8 @@ baz
 =end
 ---
 <html><body bgcolor="#ffffff">
-<p>bar bar bar
-baz</p>
+bar bar bar
+baz
 </body></html>
 ===
 =begin filter foo
@@ -66,7 +66,7 @@ The options are:
 =end
 ---
 <html><body bgcolor="#ffffff">
-<p>[The options are:]<a b c></p>
+[The options are:]<a b c>
 </body></html>
 ===
 =begin filter verb
@@ -78,8 +78,9 @@ verbatim textblock
 =end
 ---
 <html><body bgcolor="#ffffff">
-<pre>    verbatim block</pre>
-<pre>verbatim textblock</pre>
+<pre>    verbatim block
+
+verbatim textblock</pre>
 </body></html>
 TESTS
 
