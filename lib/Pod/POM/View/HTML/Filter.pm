@@ -483,76 +483,17 @@ B<Note:> The fact that I mention I<verbatim> and I<paragraph> in
 this section is due to an old bug in C<Pod::POM>, which parses the
 content of C<begin>/C<end> sections as the usual POD paragraph
 and verbatim blocks. This is a bug in C<Pod::POM>, around which
-C<Pod::POM::View::HTML::Filter> tries to work around. The best
-way to work around this bug in POD documents you want to present
-with C<Pod::POM::View::HTML::Filter> is to always indent your
-C<=begin filter> section with a fixed number of space characters.
+C<Pod::POM::View::HTML::Filter> tries to work around.
 
-Verbatim paragraphs are catenated together to form a single block
-of text, that is passed to the filter. Text paragraphs can contain
-POD escape sequences, such as C<BE<lt>...E<gt>>.
+As from version 0.06, C<Pod::POM::View::HTML::Filter> gets to the
+original text contained in the C<=begin> / C<=end> block (it was
+easier than I thought, actually) and put that string throught all
+the filters.
 
-These escape sequences are processed B<before> the paragraph is passed
-through the filter stack. A C<=for> block always contains a single text
-block, not a verbatim block, even if it starts with whitespace.
-
-This means that the following block:
-
-    =begin filter foo
-
-    a paragraph
-
-        verbatim 1
-
-        verbatim 2
-
-    another paragraph
-    somewhat longer
-
-    a third paragraph
-
-        verbatim 3
-
-    =end
-
-will be handled as five separate blocks:
-
-=over 4
-
-=item *
-
-a text block
-
-C<a paragraph>
-
-=item *
-
-a three line verbatim block
-
-C<    verbatim 1>, blank line, C<    verbatim 2>
-
-=item *
-
-a two line long text block
-
-C<another paragraph>, C<somewhat longer>
-
-=item *
-
-a single line text block 
-
-C<a third paragraph>
-
-=item *
-
-and a last verbatim block
-
-C<    verbatim 3>
-
-=back
-
-Each block will be filtered independently by the filter stack and the result
-will be catenated together and output in your HTML document.
+If any filter in the stack is defined as C<verbatim>, or if C<Pod::POM>
+detect any block in the C<=begin> / C<=end> block as verbatim, then
+the output will be produced between C<< <pre> >> and C<< </pre> >> tags.
+Otherwise, C<< <p> >> and C<< </p> >> tags will be used.
 
 =head2 Examples
 
