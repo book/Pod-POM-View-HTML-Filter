@@ -114,7 +114,7 @@ my @tests3 = map { [ split /^---.*?^/ms ] } split /^===.*?^/ms, << 'TESTS';
 <html><body bgcolor="#ffffff">
 <pre><span class="h-lno">  1</span> <span class="h-ent">&amp;lt;</span>p<span class="h-ent">&amp;gt;</span>line 1<span class="h-ent">&amp;lt;</span>/p<span class="h-ent">&amp;gt;</span>
 <span class="h-lno">  2</span>     <span class="h-ent">&amp;lt;</span>p<span class="h-ent">&amp;gt;</span>line 2<span class="h-ent">&amp;lt;</span>/p<span class="h-ent">&amp;gt;</span></pre>
-<pre><span class="h-lno">  1</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
+<pre>    <span class="h-lno">  1</span> <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
 </body></html>
 TESTS
 
