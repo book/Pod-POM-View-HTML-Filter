@@ -16,7 +16,6 @@ __RESULT__
 -perl
 <html><body bgcolor="#ffffff">
 <p>foo</p>
-$A++; # this works too
-
+<pre>$A++; # this works too</pre>
 <p>bar</p>
 </body></html>

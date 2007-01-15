@@ -13,8 +13,6 @@ __RESULT__
 __RESULT__
 -perl
 <html><body bgcolor="#ffffff">
-<p># now in full colour!
-$A++;
-
-</p>
+<pre># now in full colour!
+$A++;</pre>
 </body></html>
