@@ -1,4 +1,4 @@
-use Test::More tests => 22;
+use Test::More;
 use strict;
 use Pod::POM;
 use Pod::POM::View::HTML::Filter;
@@ -9,6 +9,25 @@ my @PPVHF  = ( [ $object, 'instance' ], [ $class, 'class' ] );
 my $foo    = {
     code => sub { my $s = shift; $s =~ s/foo/bar/g; $s }
 };
+
+plan tests => 12 * @PPVHF;
+
+# try to add a filter without some prereq
+for my $PPVHF (@PPVHF) {
+    eval {
+        $PPVHF->[0]->add(
+            FOOMP => {
+                code     => sub { },
+                requires => ['SHIKA::SHIKA::SHIKA::SHIKA'],
+            }
+        );
+    };
+    like(
+        $@,
+        qr/^FOOMP: pre-requisite (?:SHIKA::){3}SHIKAP could not be loaded /,
+        "Missing prereq ($PPVHF->[1])"
+    );
+}
 
 # no foo built-in
 for my $PPVHF (@PPVHF) {
