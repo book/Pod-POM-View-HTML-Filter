@@ -1,4 +1,5 @@
 CVS/
+\.svn/
 \.bak$
 \.sw[a-z]$
 \.tar$
@@ -18,5 +19,6 @@ CVS/
 ~$
 ^TODO$
 ^.cvsignore$
-^t/01pod.t$
 ^Pod-POM-View-HTML-Filter-
+^cover_db
+^testlibs/
