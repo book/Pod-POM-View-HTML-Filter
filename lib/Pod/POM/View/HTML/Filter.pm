@@ -37,8 +37,6 @@ my %builtin = (
     },
 );
 
-my $HTML_PROTECT = 0;
-
 # automatically register built-in handlers
 my $INIT = 1;
 add( "PPVHF", %builtin );
