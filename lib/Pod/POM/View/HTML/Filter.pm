@@ -233,7 +233,7 @@ sub _cleanup {
 sub _unindent {
     my $str = shift;
     my $indent;
-    while ( $str =~ /^(\s*)\S/gmc ) {
+    while ( $str =~ /^( *)\S/gmc ) {
         $indent =
               !defined $indent             ? $1
             : length($1) < length($indent) ? $1
