@@ -127,7 +127,7 @@ sub view_for {
         return '' unless defined $args; # silently skip
 
         my $output = $for->text;
-        my $verbatim;
+        my $verbatim = 0;
 
         # stacked filters
         for my $lang (split /\|/, $args) {
@@ -136,7 +136,7 @@ sub view_for {
             $lang = exists $filter->{$lang} ? $lang : 'default';
 
             $output   = $filter->{$lang}{code}->( $output, "" );
-            $verbatim = $filter->{$lang}{verbatim};
+            $verbatim++ if $filter->{$lang}{verbatim};
         }
         return sprintf(
             ( $verbatim ? "<pre>%s</pre>\n" : "%s\n\n" ),
@@ -161,14 +161,15 @@ sub view_begin {
 
         # fetch the text and verbatim blocks in the begin section
         # and remember the type of each block
+        my $verbatim = 0;
         my $prev = '';
         my $text = '';
         for my $item ( @{ $begin->content } ) {
             $text .= ($prev ? "\n\n" :'') . $item->text();
             $prev = 1;
+            $verbatim++ if $item->type() eq 'verbatim';
         }
 
-        my $verbatim;
         for my $f (@filters) {
             my ( $lang, $opts ) = split( ' ', $f, 2 );
             $lang = exists $filter->{$lang} ? $lang : 'default';
@@ -177,18 +178,13 @@ sub view_begin {
             ( my $indent, $text ) = _unindent( $text )
                 if $self->{auto_unindent};
             $text = $filter->{$lang}{code}->( $text, $opts );
-            $verbatim   = $filter->{$lang}{verbatim} || 0;
+            $verbatim++ if $filter->{$lang}{verbatim};
             $text =~ s/^(?=.+)/$indent/gm
                 if $self->{auto_unindent};
         }
 
         # the enclosing tags depend on the block and the last filter
-        return sprintf(
-            ( $verbatim #|| $block->[1] eq 'verbatim'
-              ? "<pre>%s</pre>\n"
-              : "<p>%s</p>\n"     ),
-            $text
-        );
+        return $verbatim ? "<pre>$text</pre>\n" : "$text\n";
     }
 
     # fall-through
