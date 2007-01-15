@@ -13,6 +13,6 @@ B<span class="h-ab">&lt;</span><span class="h-tag">bold</span><span class="h-ab"
 __RESULT__
 -html
 <html><body bgcolor="#ffffff">
-<p>&lt;b&gt;escaped&lt;/b&gt;
-B&lt;bold&gt;</p>
+<pre>&lt;b&gt;escaped&lt;/b&gt;
+B&lt;bold&gt;</pre>
 </body></html>

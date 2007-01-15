@@ -17,7 +17,8 @@ __RESULT__
 __RESULT__
 -html
 <html><body bgcolor="#ffffff">
-<p>&lt;p&gt;line 1&lt;/p&gt;</p>
-    &lt;p&gt;line 2&lt;/p&gt;</pre>
-<pre>    &lt;p&gt;line 4&lt;/p&gt;</pre>
+<pre>&lt;p&gt;line 1&lt;/p&gt;
+    &lt;p&gt;line 2&lt;/p&gt;
+
+    &lt;p&gt;line 4&lt;/p&gt;</pre>
 </body></html>

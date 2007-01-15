@@ -22,7 +22,9 @@ __RESULT__
 -html
 <html><body bgcolor="#ffffff">
 <pre>    &lt;!-- a longer piece of HTML --&gt;
-    &lt;p&gt;First paragraph&lt;/p&gt</pre>
+    &lt;p&gt;First paragraph&lt;/p&gt;
 
-<pre>    &lt;p&gt;End&lt;/p&gt;</pre>
+&lt;p&gt;another para&lt;/p&gt;
+
+    &lt;p&gt;End&lt;/p&gt;</pre>
 </body></html>

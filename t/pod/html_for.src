@@ -7,7 +7,6 @@ __RESULT__
 __RESULT__
 -html
 <html><body bgcolor="#ffffff">
-&lt;b&gt;bold&lt;/b&gt;
-
-
+<pre>&lt;b&gt;bold&lt;/b&gt;
+</pre>
 </body></html>
