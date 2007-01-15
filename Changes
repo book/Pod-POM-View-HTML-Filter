@@ -14,6 +14,11 @@ Revision history for Pod-POM-View-HTML-Filter
           auto_unindent => 0 in the constructor
         - HTML characters '&', '<' and '>' are now escaped in the default
           filter
+        - the result is enclosed in <pre>...</pre> if any of the filters
+          if declared as 'verbatim', and also if Pod::POM detected a
+          verbatim block inside the begin block (which it shouldn't do,
+          since begin block should be opaque to it... but that's a bug
+          in Pod::POM). Otherwise it's enclosed in <p>...</p> tags.
         [TEST]
         - the main test script (t/20builtins.t) uses the files in
           t/pod/ as test data. Those files contain a pod source, and
