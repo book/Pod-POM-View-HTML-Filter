@@ -37,7 +37,6 @@ para
 ---
 <html><body bgcolor="#ffffff">
 <p>bar bar bar</p>
-
 <p>para</p>
 </body></html>
 ===
@@ -55,7 +54,6 @@ para
 <p>para</p>
 <p>bar bar bar
 bar bar bar</p>
-
 <p>para</p>
 </body></html>
 ===
