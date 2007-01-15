@@ -12,21 +12,25 @@ my $foo    = {
 
 plan tests => 12 * @PPVHF;
 
+my $has_test_warn = eval "use Test::Warn; 1";
+
 # try to add a filter without some prereq
-for my $PPVHF (@PPVHF) {
-    eval {
-        $PPVHF->[0]->add(
-            FOOMP => {
-                code     => sub { },
-                requires => ['SHIKA::SHIKA::SHIKA::SHIKA'],
-            }
+SKIP: {
+    skip "Test::Warn not available", 2 unless $has_test_warn;
+
+    for my $PPVHF (@PPVHF) {
+        warning_like(sub {
+                $PPVHF->[0]->add(
+                    FOOMP => {
+                        code     => sub { },
+                        requires => ['SHIKA::SHIKA::SHIKA::SHIKA'],
+                    }
+                );
+            },
+            qr/^FOOMP: pre-requisite (?:SHIKA::){3}SHIKA could not be loaded /,
+            "Missing prereq ($PPVHF->[1])"
         );
-    };
-    like(
-        $@,
-        qr/^FOOMP: pre-requisite (?:SHIKA::){3}SHIKAP could not be loaded /,
-        "Missing prereq ($PPVHF->[1])"
-    );
+    }
 }
 
 # no foo built-in
