@@ -31,6 +31,7 @@ t/pod/perl_begin3.src
 t/pod/perl_for.src
 t/pod/perl_html.src
 t/pod/perl_long.src
-t/pod/shell_begin.src
+t/pod/shell_begin1.src
+t/pod/shell_begin2.src
 t/pod/shell_for.src
 t/portfs.t
