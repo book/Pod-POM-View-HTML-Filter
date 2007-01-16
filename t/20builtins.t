@@ -76,22 +76,10 @@ for my $file ( sort keys %result ) {
 
             # test a duplicate run on the same $pom/$view pair
             if ( $format =~ /\+/ ) {
-            TODO:
-                if ( $format =~ /\+perl/ ) {
-
-                    # this fails only with the Perl::Tidy plugin
-                    local $TODO = "BUG: lost part of the Pod::POM structure";
-                    is( $view->print($pom),
-                        $result{$file}{$format},
-                        "$file <$format> (2nd run)"
-                    );
-                }
-                else {
-                    is( $view->print($pom),
-                        $result{$file}{$format},
-                        "$file <$format> (2nd run)"
-                    );
-                }
+                is( $view->print($pom),
+                    $result{$file}{$format},
+                    "$file <$format> (2nd run)"
+                );
             }
         }
     }
