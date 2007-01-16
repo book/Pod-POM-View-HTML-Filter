@@ -12,6 +12,7 @@ t/10interface.t
 t/11filters.t
 t/12default.t
 t/13stack.t
+t/14indent.t
 t/20builtins.t
 t/30perltidy.t
 t/distchk.t
@@ -25,6 +26,9 @@ t/pod/html_begin4.src
 t/pod/html_for.src
 t/pod/html_list.src
 t/pod/html_nnn.src
+t/pod/kate_diff.src
+t/pod/kate_fortran.src
+t/pod/kate_ldif.src
 t/pod/perl_begin1.src
 t/pod/perl_begin2.src
 t/pod/perl_begin3.src
