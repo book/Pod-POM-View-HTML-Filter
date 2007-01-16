@@ -1,32 +1,3 @@
-=begin kate Mason
-
-  <html>
-  <body>
-
-  % my $variable = 'World';
-  Hello <% $variable %>!
-  <%perl>
-  use POSIX qw(uname);
-  my $systeme = (uname())[0];
-  </%perl>
-  Ce serveur web utilise <% $systeme %>.
-  % if (lc($systeme) eq 'linux') {
-  C'est bien !
-  % } else {
-  Ce n'est pas grave, nous ne sommes pas sectaires.
-  % }
-
-  %# ceci est un commentaire
-  <% # Ceci est également un commentaire, rarement utilisé %>
-
-  %# nous pouvons faire du vrai perl, par exemple appeler un module
-  % use Data::Dumper;
-  % my $a = { foo => 'bar' }
-  <% Dumper(\$a) %>
-
-  </body>
-  </html>
-
 =begin filter kate Fortran
 
     ! Exemple de computed GO TO
