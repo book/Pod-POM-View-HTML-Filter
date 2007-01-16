@@ -2,6 +2,9 @@
 
 nostrum cumque irure temporibus adipisci culpa necessitatibus provident
 mollitia duis fugiat quibusdam est ullam maxime totam reprehenderit
+
+=for filter html <hr />
+
 eveniet cum dolorum doloribus numquam voluptas quam dicta ipsam voluptates
 proident sit dignissimos quas natus
 
@@ -26,8 +29,8 @@ __RESULT__
 <h1>accusantium sit doloremque</h1>
 
 <p>nostrum cumque irure temporibus adipisci culpa necessitatibus provident
-mollitia duis fugiat quibusdam est ullam maxime totam reprehenderit
-eveniet cum dolorum doloribus numquam voluptas quam dicta ipsam voluptates
+mollitia duis fugiat quibusdam est ullam maxime totam reprehenderit</p>
+<p>eveniet cum dolorum doloribus numquam voluptas quam dicta ipsam voluptates
 proident sit dignissimos quas natus</p>
 <p>eiusmod voluptatibus aliqua <b>incididunt</b> excepturi
 do iusto omnis facilis iure</p>
