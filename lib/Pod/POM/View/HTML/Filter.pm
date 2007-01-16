@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my %filter;
 my %builtin = (
@@ -33,6 +33,11 @@ my %builtin = (
     shell => {
         code     => \&shell_filter,
         requires => [qw( Syntax::Highlight::Shell )],
+        verbatim => 1,
+    },
+    kate => {
+        code     => \&kate_filter,
+        requires => [qw( Syntax::Highlight::Engine::Kate )],
         verbatim => 1,
     },
 );
@@ -278,6 +283,46 @@ sub shell_filter {
     my $parser = $filter_parser{shell}{$opts}
       ||= Syntax::Highlight::Shell->new( map { (split /=/) } split ' ', $opts );
     return _cleanup( $parser->parse($code) );
+}
+
+# Kate highligthing thanks to Syntax::Highlight::Engine::Kate
+sub kate_filter {
+    my ($code, $opts) = @_;
+    my ($lang) = split ' ', $opts || ''; 
+
+    my $parser = $filter_parser{shell}{$lang}
+      ||= Syntax::Highlight::Engine::Kate->new(
+        language => $lang,
+        substitutions => {
+            '<' => '&lt;',
+            '>' => '&gt;',
+            '&' => '&amp;',
+        },
+        format_table => {
+            Alert        => [ '<span class="k-alert">',        '</span>' ],
+            BaseN        => [ '<span class="k-basen">',        '</span>' ],
+            BString      => [ '<span class="k-bstring">',      '</span>' ],
+            Char         => [ '<span class="k-char">',         '</span>' ],
+            Comment      => [ '<span class="k-comment">',      '</span>' ],
+            DataType     => [ '<span class="k-datatype">',     '</span>' ],
+            DecVal       => [ '<span class="k-decval">',       '</span>' ],
+            Error        => [ '<span class="k-error">',        '</span>' ],
+            Float        => [ '<span class="k-float">',        '</span>' ],
+            Function     => [ '<span class="k-function">',     '</span>' ],
+            IString      => [ '<span class="k-istring">',      '</span>' ],
+            Keyword      => [ '<span class="k-keyword">',      '</span>' ],
+            Normal       => [ '',                              '' ],
+            Operator     => [ '<span class="k-operator">',     '</span>' ],
+            Others       => [ '<span class="k-others">',       '</span>' ],
+            RegionMarker => [ '<span class="k-regionmarker">', '</span>' ],
+            Reserved     => [ '<span class="k-reserved">',     '</span>' ],
+            String       => [ '<span class="k-string">',       '</span>' ],
+            Variable     => [ '<span class="k-variable">',     '</span>' ],
+            Warning      => [ '<span class="k-warning">',      '</span>' ],
+        },
+    );
+
+    return $parser->highlightText($code);
 }
 
 1;
@@ -829,6 +874,34 @@ The filter supports C<Syntax::Highlight::Shell> options:
 
 See C<Syntax::Highlight::Shell> for the list of supported options.
 
+=item kate_filter
+
+This filter support syntax highlighting for numerous languages
+with the help of C<Syntax::Highlight::Engine::Kate>.
+
+The filter supports C<Syntax::Highlight::Engine::Kate> languages as options:
+
+     =begin filter kate Diff
+     
+         Index: lib/Pod/POM/View/HTML/Filter.pm
+         ===================================================================
+         --- lib/Pod/POM/View/HTML/Filter.pm     (revision 99)
+         +++ lib/Pod/POM/View/HTML/Filter.pm     (working copy)
+         @@ -27,6 +27,11 @@
+                  requires => [qw( Syntax::Highlight::Shell )],
+                  verbatim => 1,
+              },
+         +    kate => {
+         +        code     => \&kate_filter,
+         +        requires => [qw( Syntax::Highlight::Engine::Kate )],
+         +        verbatim => 1,
+         +    },
+          );
+          
+          my $HTML_PROTECT = 0;
+     
+     =end filter
+
 =back
 
 =head2 Writing your own filters
@@ -929,6 +1002,32 @@ C<Syntax::Highlight::Shell> makes use of the following styles:
     s-avr                   # assigned variables: VARIABLE=value
     s-val                   # shell values (inside quotes)
     s-cmt                   # shell comments
+
+=head2 C<kate> filter
+
+Output formatted with C<Syntax::Highlight::Engine::Kate> makes use
+of the following styles:
+
+    k-alert                 # Alert
+    k-basen                 # BaseN
+    k-bstring               # BString
+    k-char                  # Char
+    k-comment               # Comment
+    k-datatype              # DataType
+    k-decval                # DecVal
+    k-error                 # Error
+    k-float                 # Float
+    k-function              # Function
+    k-istring               # IString
+    k-keyword               # Keyword
+    k-normal                # Normal
+    k-operator              # Operator
+    k-others                # Others
+    k-regionmarker          # RegionMarker
+    k-reserved              # Reserved
+    k-string                # String
+    k-variable              # Variable
+    k-warning               # Warning
 
 =head1 HISTORY
 
