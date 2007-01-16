@@ -1047,10 +1047,36 @@ Philippe "BooK" Bruhat, C<< <book@cpan.org> >>
 Many thanks to Sébastien Aperghis-Tramoni (Maddingue), who helped
 debugging the module and wrote C<Syntax::Highlight::HTML> and
 C<Syntax::Highlight::Shell> so that I could ship PPVHF with more than
-one filter.
+one filter. He also pointed me to C<Syntax::Highlight::Engine::Kate>,
+which led me to clean up PPVHF before adding support for SHEK.
 
 Perl code examples where borrowed in Amelia,
 aka I<Programming Perl, 3rd edition>.
+
+=head1 TODO
+
+There are a few other syntax highlighting modules on CPAN, which I should
+try to add support for in C<Pod::POM::View::HTML::Filter>:
+
+=over 4
+
+=item *
+
+C<Syntax::Highlight::Universal>
+
+=item *
+
+C<Syntax::Highlight::Mason>
+
+=item *
+
+C<Syntax::Highlight::Perl> (seems old)
+
+=item *
+
+C<Syntax::Highlight::Perl::Improved>
+
+=back
 
 =head1 BUGS
 
