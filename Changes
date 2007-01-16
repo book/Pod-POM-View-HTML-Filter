@@ -22,11 +22,19 @@ Revision history for Pod-POM-View-HTML-Filter
         - when processing a filter stack, if one of the filters is not
           available, the whole stack is replaced with the 'default'
           filter
-        [TEST]
-        - the main test script (t/20builtins.t) uses the files in
-          t/pod/ as test data. Those files contain a pod source, and
-          the expected results according to a combination of available
-          filters.
+        [DOCUMENTATION]
+        - the Caveats listed in the documentation are no longer valid,
+          since the content of the begin block is now processed as
+          a string where the POD escape sequences are left alone
+        [FIXES]
+        - the bug discovered in version 0.03 has been unexpectedly
+          removed, when reworking the processing of the filter stack
+        [TESTS]
+        - the main test script (t/20builtins.t) uses the files in t/pod/
+          as test data. Those files contain a pod source, and the expected
+          results according to a combination of available filters.
+        - the tests related to the "disappearing POM" bug are no longer
+           marked TODO
 
 0.05 Thu Oct 14 11:44:14 CEST 2004
         [FEATURES]
