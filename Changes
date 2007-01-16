@@ -1,6 +1,6 @@
 Revision history for Pod-POM-View-HTML-Filter
 
-0.06
+0.06 Tue Jan 16 01:59:05 CET 2007
         [ENHANCEMENTS]
         - add() behaves differently when called on the class or an
           instance, and updates the appropriate list of filters:
@@ -34,7 +34,7 @@ Revision history for Pod-POM-View-HTML-Filter
           as test data. Those files contain a pod source, and the expected
           results according to a combination of available filters.
         - the tests related to the "disappearing POM" bug are no longer
-           marked TODO
+          marked TODO
 
 0.05 Thu Oct 14 11:44:14 CEST 2004
         [FEATURES]
