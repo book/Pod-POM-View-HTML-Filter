@@ -21,6 +21,14 @@ repudiandae sint ab eos recusandae sequi dolore quo quos quia incididunt
 
 =for html <hr />
 
+quisquam voluptate proident cupidatat libero soluta optio
+
+=begin zlonk
+
+harum totam rem magna cumque aliquid tempora
+
+=end zlonk
+
 doloremque adipisicing perspiciatis deleniti at provident alias qui itaque
 
 __RESULT__
@@ -37,5 +45,6 @@ do iusto omnis facilis iure</p>
 <p>repudiandae sint ab eos recusandae sequi dolore quo quos quia incididunt</p>
 <hr />
 
+<p>quisquam voluptate proident cupidatat libero soluta optio</p>
 <p>doloremque adipisicing perspiciatis deleniti at provident alias qui itaque</p>
 </body></html>
