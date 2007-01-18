@@ -290,7 +290,7 @@ sub kate_filter {
     my ($code, $opts) = @_;
     my ($lang) = split ' ', $opts || ''; 
 
-    my $parser = $filter_parser{shell}{$lang}
+    my $parser = $filter_parser{kate}{$lang}
       ||= Syntax::Highlight::Engine::Kate->new(
         language => $lang,
         substitutions => {
