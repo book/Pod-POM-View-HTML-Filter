@@ -28,6 +28,7 @@ t/pod/html_list.src
 t/pod/html_nnn.src
 t/pod/kate_diff.src
 t/pod/kate_fortran.src
+t/pod/kate_fortran_for.src
 t/pod/kate_ldif.src
 t/pod/perl_begin1.src
 t/pod/perl_begin2.src
