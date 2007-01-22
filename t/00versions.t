@@ -8,6 +8,7 @@ for my $module ( qw(
     Perl::Tidy
     Syntax::Highlight::HTML
     Syntax::Highlight::Shell
+    Syntax::Highlight::Engine::Kate
 ) ) {
     eval "require $module;";
     diag $@ ? "$module not installed"
