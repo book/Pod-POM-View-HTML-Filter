@@ -274,7 +274,7 @@ my %filter_parser;
 
 # Perl highlighting, thanks to PPI::HTML
 sub ppi_filter {
-    my ($code, $opts) = (@_, '');
+    my ($code, $opts) = ( shift, shift || '');
 
     # PPI::HTML options
     my %ppi_opt = map { !/=/ && s/$/=1/ ; split /=/, $_, 2 } split / /, $opts;
@@ -282,7 +282,11 @@ sub ppi_filter {
     # create PPI::HTML syntax highlighter
     my $highlighter = $filter_parser{ppi}{$opts} ||= PPI::HTML->new(%ppi_opt);
 
-    return "<pre>\n" . $highlighter->html(\$code) . "</pre>\n";
+    # highlight the code and clean up the resulting HTML
+    my $pretty = $highlighter->html(\$code);
+    $pretty =~ s/<br>$//gsm;
+
+    return $pretty;
 }
 
 # HTML highlighting thanks to Syntax::Highlight::HTML
