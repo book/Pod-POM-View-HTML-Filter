@@ -1,9 +1,12 @@
 Revision history for Pod-POM-View-HTML-Filter
 
-0.08
+0.08 Thu Jan 25 23:53:59 CET 2007
         [ENHANCEMENTS]
         - Sébastien Aperghis-Tramoni added support for a new Perl
           highlighter: PPI::HTML
+        [EXAMPLES]
+        - example stylesheets included for the following filters:
+          perl, html, kate and ppi
 
 0.07 Tue Jan 16 23:27:48 CET 2007
         [ENHANCEMENTS]
