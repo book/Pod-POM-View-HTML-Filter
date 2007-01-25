@@ -972,7 +972,7 @@ as before.
 
 =head1 BUILT-IN FILTERS CSS STYLES
 
-Each filter defines its own CSS styles, so that one can define their
+Each filter uses its own CSS classes, so that one can define their
 favourite colours in a custom CSS file.
 
 =head2 C<perl> filter
@@ -981,7 +981,7 @@ C<Perl::Tidy>'s HTML code looks like:
 
     <span class="i">$A</span>++<span class="sc">;</span>
 
-Here are the styles used by C<Perl::Tidy>:
+Here are the classes used by C<Perl::Tidy>:
 
     n        numeric
     p        paren
@@ -1025,7 +1025,7 @@ C<PPI::HTML> uses the following CSS classes:
 
 =head2 C<html> filter
 
-C<Syntax::Highlight::HTML> makes use of the following styles:
+C<Syntax::Highlight::HTML> makes use of the following classes:
 
     h-decl   declaration    # declaration <!DOCTYPE ...>
     h-pi     process        # process instruction <?xml ...?>
@@ -1038,7 +1038,7 @@ C<Syntax::Highlight::HTML> makes use of the following styles:
 
 =head2 C<shell> filter
 
-C<Syntax::Highlight::Shell> makes use of the following styles:
+C<Syntax::Highlight::Shell> makes use of the following classes:
 
     s-key                   # shell keywords (like if, for, while, do...)
     s-blt                   # the builtins commands
@@ -1054,7 +1054,7 @@ C<Syntax::Highlight::Shell> makes use of the following styles:
 =head2 C<kate> filter
 
 Output formatted with C<Syntax::Highlight::Engine::Kate> makes use
-of the following styles:
+of the following classes:
 
     k-alert                 # Alert
     k-basen                 # BaseN
