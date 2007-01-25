@@ -25,6 +25,11 @@ my %builtin = (
         requires => [qw( Perl::Tidy )],
         verbatim => 1,
     },
+    ppi => {
+        code     => \&ppi_filter,
+        requires => [qw( PPI PPI::HTML )],
+        verbatim => 1,
+    },
     html => {
         code     => \&html_filter,
         requires => [qw( Syntax::Highlight::HTML )],
@@ -74,7 +79,7 @@ sub add {
                 eval "require $_;";
                 if ($@) {
                     $nok++;
-                    carp "$lang: pre-requisite $_ could not be loaded"
+                    carp "$lang\: pre-requisite $_ could not be loaded"
                       unless $INIT;    # don't warn for built-ins
                 }
             }
@@ -239,7 +244,7 @@ sub _unindent {
 # builtin filters
 #
 
-# perl highlighting, thanks to Perl::Tidy
+# Perl highlighting, thanks to Perl::Tidy
 sub perl_filter {
     my ($code, $opts) = ( shift, shift || "" );
     my $output = "";
@@ -266,6 +271,19 @@ sub perl_filter {
 
 # a cache for multiple parsers with the same options
 my %filter_parser;
+
+# Perl highlighting, thanks to PPI::HTML
+sub ppi_filter {
+    my ($code, $opts) = (@_, '');
+
+    # PPI::HTML options
+    my %ppi_opt = map { !/=/ && s/$/=1/ ; split /=/, $_, 2 } split / /, $opts;
+
+    # create PPI::HTML syntax highlighter
+    my $highlighter = $filter_parser{ppi}{$opts} ||= PPI::HTML->new(%ppi_opt);
+
+    return "<pre>\n" . $highlighter->html(\$code) . "</pre>\n";
+}
 
 # HTML highlighting thanks to Syntax::Highlight::HTML
 sub html_filter {
@@ -842,6 +860,15 @@ It accepts options to C<Perl::Tidy>, such as C<-nnn> to number lines of
 code. Check C<Perl::Tidy>'s documentation for more information about
 those options.
 
+=item ppi_filter
+
+This filter does Perl syntax highlighting using C<PPI::HTML>, which is 
+itself based on the incredible C<PPI>.
+
+It accepts the same options as C<PPI::HTML>, which at this time solely 
+consist of C<line_numbers> to, as one may guess, add line numbers to the 
+output. 
+
 =item html_filter
 
 This filter does HTML syntax highlighting with the help of
@@ -974,6 +1001,27 @@ Here are the styles used by C<Perl::Tidy>:
     sc       semicolon
     m        subroutine
     pd       pod-text
+
+=head2 C<ppi> filter
+
+C<PPI::HTML> uses the following CSS classes: 
+
+    comment            
+    double             
+    heredoc_content    
+    interpolate        
+    keyword            for language keywords (my, use
+    line_number        
+    number             
+    operator           for language operators
+    pragma             for pragmatas (strict, warnings)
+    single             
+    structure          for syntaxic symbols
+    substitute         
+    symbol             
+    word               for module, function and method names
+    words              
+    match              
 
 =head2 C<html> filter
 
