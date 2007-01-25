@@ -1,5 +1,5 @@
 /* 
- * perltidy's styles
+ * Perl::Tidy CSS rules
  */
 .c  { color: #228B22;                    } /* comment */
 .cm { color: #000000;                    } /* comma */
@@ -18,5 +18,5 @@
 .s  { color: #000000;                    } /* structure */
 .sc { color: #000000;                    } /* semicolon */
 .v  { color: #B452CD;                    } /* v-string */
-.w  { color: #000000;                    } /* bareword */
+.w  { color: #8B008B; font-weight: bold; } /* bareword */
 
