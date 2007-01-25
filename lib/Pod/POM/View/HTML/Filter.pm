@@ -933,6 +933,15 @@ The filter supports C<Syntax::Highlight::Engine::Kate> languages as options:
      
      =end filter
 
+Check the C<Syntax::Highlight::Engine::Kate> documentation for the full
+list of supported languages. Please note that some of them aren't well
+supported yet (by C<Syntax::Highlight::Engine::Kate>), so the output
+may not be what you expect.
+
+Here is a list of languages we have successfully tested with
+C<Syntax::Highlight::Engine::Kate> version 0.02:
+C<C>, C<Diff>, C<Fortran>, C<JavaScript>, C<LDIF>, C<SQL>.
+
 =back
 
 =head2 Writing your own filters
