@@ -6,6 +6,20 @@ use File::Spec::Functions;
 use Pod::POM;
 use Pod::POM::View::HTML::Filter;
 
+eval { require Test::LongString; import Test::LongString; };
+my $has_test_longstring = $@ eq '';
+
+# our own string comparison test function
+sub is_same_string {
+    my ($got, $expected, $name) = @_;
+    if ($has_test_longstring) {
+        is_string( $got, $expected, $name);
+    }
+    else {
+        is( $got, $expected, $name);
+    }
+}
+
 my %avail = map { $_ => 1 }
     grep { $_ ne 'default' } Pod::POM::View::HTML::Filter->filters();
 
@@ -69,14 +83,14 @@ for my $file ( sort keys %result ) {
             my $pom = Pod::POM->new()->parse_text( $pod{$file} );
 
             # compare the results
-            is( $view->print($pom),
+            is_same_string( $view->print($pom),
                 $result{$file}{$format},
                 "$file <$format>"
             );
 
             # test a duplicate run on the same $pom/$view pair
             if ( $format =~ /\+/ ) {
-                is( $view->print($pom),
+                is_same_string( $view->print($pom),
                     $result{$file}{$format},
                     "$file <$format> (2nd run)"
                 );
