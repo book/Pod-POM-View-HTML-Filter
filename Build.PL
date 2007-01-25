@@ -11,8 +11,8 @@ my $builder = Module::Build->new(
         'Pod::POM'   => '0.17',
     },
     recommends         => {
-        'PPI'                      => '1.118',
-        'PPI::HTML'                => '1.07',
+        'PPI'                      => '1.111',
+        'PPI::HTML'                => '1.06',
         'Perl::Tidy'               => '20031021',
         'Syntax::Highlight::HTML'  => '0.02',
         'Syntax::Highlight::Shell' => '0.02',
