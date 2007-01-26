@@ -20,15 +20,17 @@ my %builtin = (
         },
         verbatim => 1,
     },
-    perl => {
-        code     => \&perl_filter,
+    perl_tidy => {
+        code     => \&perl_tidy_filter,
         requires => [qw( Perl::Tidy )],
         verbatim => 1,
+        alias    => [qw( perl )],
     },
-    ppi => {
-        code     => \&ppi_filter,
+    perl_ppi => {
+        code     => \&perl_ppi_filter,
         requires => [qw( PPI PPI::HTML )],
         verbatim => 1,
+        alias    => [qw( ppi )],
     },
     html => {
         code     => \&html_filter,
@@ -84,7 +86,12 @@ sub add {
         croak "$lang: no code parameter given"
           unless exists $args{$lang}{code};
 
-        $filter->{$lang} = $args{$lang} unless $nok;
+        if ( !$nok ) {
+            $filter->{$lang} = $args{$lang};
+            if ( $args{$lang}{alias} ) {
+                $filter->{$_} = $args{$lang} for @{ $args{$lang}{alias} };
+            }
+        }
     }
 }
 
@@ -247,8 +254,11 @@ sub _unindent {
 # builtin filters
 #
 
+# a cache for multiple parsers with the same options
+my %filter_parser;
+
 # Perl highlighting, thanks to Perl::Tidy
-sub perl_filter {
+sub perl_tidy_filter {
     my ($code, $opts) = ( shift, shift || "" );
     my $output = "";
 
@@ -272,11 +282,8 @@ sub perl_filter {
     return $output;
 }
 
-# a cache for multiple parsers with the same options
-my %filter_parser;
-
 # Perl highlighting, thanks to PPI::HTML
-sub ppi_filter {
+sub perl_ppi_filter {
     my ($code, $opts) = ( shift, shift || '');
 
     # PPI::HTML options
@@ -858,7 +865,7 @@ C<$Pod::POM::View::HTML::Filter::default>. This allows one to do:
 
 and set all existing filters back to default.
 
-=item perl_filter
+=item perl_tidy_filter
 
 This filter does Perl syntax highlighting with a lot of help from
 C<Perl::Tidy>.
@@ -867,7 +874,7 @@ It accepts options to C<Perl::Tidy>, such as C<-nnn> to number lines of
 code. Check C<Perl::Tidy>'s documentation for more information about
 those options.
 
-=item ppi_filter
+=item perl_ppi_filter
 
 This filter does Perl syntax highlighting using C<PPI::HTML>, which is 
 itself based on the incredible C<PPI>.
