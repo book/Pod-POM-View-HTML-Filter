@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 my %filter;
 my %builtin = (
@@ -49,7 +49,7 @@ my %builtin = (
 
 # automatically register built-in handlers
 my $INIT = 1;
-add( "PPVHF", %builtin );
+Pod::POM::View::HTML::Filter->add( %builtin );
 $INIT = 0;
 
 #
@@ -67,10 +67,7 @@ sub new {
 
 sub add {
     my ($self, %args) = @_;
-    my $filter = ref $self
-        && UNIVERSAL::isa( $self, 'Pod::POM::View::HTML::Filter' )
-        ? $self->{filter}
-        : \%filter;
+    my $filter = $self->__filter();
 
     for my $lang ( keys %args ) {
         my $nok = 0;
@@ -93,11 +90,7 @@ sub add {
 
 sub delete {
     my ( $self, $lang ) = @_;
-    my $filter =
-        ref $self
-        && UNIVERSAL::isa( $self, 'Pod::POM::View::HTML::Filter' )
-        ? $self->{filter}
-        : \%filter;
+    my $filter = $self->__filter();
     my $old = $self->_filter()->{$lang};
     $filter->{$lang} = undef;
     return $old;
@@ -110,9 +103,19 @@ sub _filter {
         ref $self
         && UNIVERSAL::isa( $self, 'Pod::POM::View::HTML::Filter' )
         ? { %filter, %{ $self->{filter} } }
-        : {%filter};
+        : \%filter;
     $filter->{$_} || delete $filter->{$_} for keys %$filter;
     return $filter;
+}
+
+# return the real inner filter list for the class|instance
+sub __filter {
+    my ($self) = @_;
+    return
+        ref $self
+        && UNIVERSAL::isa( $self, 'Pod::POM::View::HTML::Filter' )
+        ? $self->{filter}
+        : \%filter;
 }
 
 sub know {
