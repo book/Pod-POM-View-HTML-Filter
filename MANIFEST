@@ -50,4 +50,10 @@ t/pod/ppi_long.src
 t/pod/shell_begin1.src
 t/pod/shell_begin2.src
 t/pod/shell_for.src
+t/pod/wiki_begin1.src
+t/pod/wiki_begin2.src
+t/pod/wiki_for.src
+t/pod/wikimedia_begin1.src
+t/pod/wikimedia_begin2.src
+t/pod/wikimedia_for.src
 t/portfs.t
