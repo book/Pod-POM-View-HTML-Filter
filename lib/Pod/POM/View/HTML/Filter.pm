@@ -203,6 +203,7 @@ sub view_begin {
         for my $item ( @{ $begin->content } ) {
             $text .= ($prev ? "\n\n" :'') . $item->text();
             $prev = 1;
+            $verbatim++ if $item->type eq 'verbatim';
         }
 
         # a block is verbatim only if all subblocks are verbatim
