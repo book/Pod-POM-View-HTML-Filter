@@ -8,8 +8,8 @@ use Carp;
 
 our $VERSION = '0.09';
 
-my %filter;
-my %builtin = (
+my  %filter;
+our %builtin = (
     default => {
         code => sub {
             my $s = shift;
