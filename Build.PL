@@ -17,6 +17,7 @@ my $builder = Module::Build->new(
         'Syntax::Highlight::HTML'  => '0.02',
         'Syntax::Highlight::Shell' => '0.02',
         'Syntax::Highlight::Engine::Kate' => '0.02',
+        'Text::WikiFormat'         => '0.76',
     },
     license            => 'perl',
     add_to_cleanup     => ['Pod-POM-View-HTML-Filter-*'],
