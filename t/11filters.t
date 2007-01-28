@@ -14,8 +14,8 @@ baz
 =end
 ---
 <html><body bgcolor="#ffffff">
-<p>bar bar bar
-baz</p>
+bar bar bar
+baz
 </body></html>
 ===
 =begin filter foo
@@ -36,7 +36,7 @@ bar foo bar
 para
 ---
 <html><body bgcolor="#ffffff">
-<p>bar bar bar</p>
+bar bar bar
 <p>para</p>
 </body></html>
 ===
@@ -52,8 +52,8 @@ para
 ---
 <html><body bgcolor="#ffffff">
 <p>para</p>
-<p>bar bar bar
-bar bar bar</p>
+bar bar bar
+bar bar bar
 <p>para</p>
 </body></html>
 ===
@@ -64,7 +64,7 @@ The options are:
 =end
 ---
 <html><body bgcolor="#ffffff">
-<p>[The options are:]<a b c></p>
+[The options are:]<a b c>
 </body></html>
 ===
 =begin filter verb

@@ -73,8 +73,8 @@ EOT
 
 is( "$pom", <<'EOH', "Correct output" );
 <html><body bgcolor="#ffffff">
-<p>bar bar bar
-baz</p>
+bar bar bar
+baz
 </body></html>
 EOH
 
