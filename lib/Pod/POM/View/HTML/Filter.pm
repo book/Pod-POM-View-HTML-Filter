@@ -52,6 +52,11 @@ our %builtin = (
         requires => [qw( Text::WikiFormat )],
         verbatim => 0,
     },
+    wikimedia => {
+        code     => \&wikimedia_filter,
+        requires => [qw( Text::MediawikiFormat )],
+        verbatim => 0,
+    },
 );
 
 # automatically register built-in handlers
@@ -367,6 +372,12 @@ sub kate_filter {
 sub wiki_filter {
     my ($code, $opts) = (shift, shift || '');
     return Text::WikiFormat::format( $code , {},
+        { map { ( split /=/ ) } split ' ', $opts } );
+}
+
+sub wikimedia_filter {
+    my ($code, $opts) = (shift, shift || '');
+    return Text::MediawikiFormat::format( $code , {},
         { map { ( split /=/ ) } split ' ', $opts } );
 }
 
@@ -976,6 +987,15 @@ as in the example below:
     [link|title]
 
     =end
+
+=item wikimedia_filter
+
+This filter converts the wiki format parsed by C<Text::MediawikiFormat>
+in HTML.
+
+The supported options are: C<prefix>, C<extended>, C<implicit_links>,
+C<absolute_links> and C<process_html>. The option and value are separated
+by a C<=> character.
 
 =back
 
