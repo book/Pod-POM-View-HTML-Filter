@@ -872,17 +872,8 @@ C<Pod::POM::View::HTML::Filter>. It does nothing more than normal POD
 processing (POD escapes for text paragraphs and C<< <pre> >> for
 verbatim paragraphs.
 
-The default filter initialisation structure is available from
-C<$Pod::POM::View::HTML::Filter::default>. This allows one to do:
-
-    Pod::POM::View::HTML::Filter->add(
-        $_ => $Pod::POM::View::HTML::Filter::default
-    ) for Pod::POM::View::HTML::Filter->filters;
-
-and set all existing filters back to default.
-
-You can also use the C<delete()> method to remove a filter
-(from the instance or the class, depending on the way it's called).
+You can use the C<delete()> method to remove a filter and therefore
+make it behave like C<default>.
 
 =item perl_tidy_filter
 
