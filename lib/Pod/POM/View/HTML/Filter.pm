@@ -47,6 +47,11 @@ my %builtin = (
         requires => [qw( Syntax::Highlight::Engine::Kate )],
         verbatim => 1,
     },
+    wiki => {
+        code     => \&wiki_filter,
+        requires => [qw( Text::WikiFormat )],
+        verbatim => 0,
+    },
 );
 
 # automatically register built-in handlers
@@ -167,7 +172,7 @@ sub view_for {
         # process the text
         $text = $filter->{ $_->[0] }{code}->( $text, $_->[1] ) for @langs;
 
-        return $verbatim ? "<pre>$text</pre>\n" : "<p>$text</p>\n";
+        return $verbatim ? "<pre>$text</pre>\n" : "$text\n";
     }
 
     # fall-through
@@ -193,8 +198,10 @@ sub view_begin {
         for my $item ( @{ $begin->content } ) {
             $text .= ($prev ? "\n\n" :'') . $item->text();
             $prev = 1;
-            $verbatim++ if $item->type() eq 'verbatim';
         }
+
+        # a block is verbatim only if all subblocks are verbatim
+        $verbatim = 0 if $verbatim != @{ $begin->content };
 
         # select the filters and options
         my @langs;
@@ -218,7 +225,7 @@ sub view_begin {
             if $self->{auto_unindent};
 
         # the enclosing tags depend on the block and the last filter
-        return $verbatim ? "<pre>$text</pre>\n" : "<p>$text</p>\n";
+        return $verbatim ? "<pre>$text</pre>\n" : "$text\n";
     }
 
     # fall-through
@@ -355,6 +362,12 @@ sub kate_filter {
     );
 
     return $parser->highlightText($code);
+}
+
+sub wiki_filter {
+    my ($code, $opts) = (shift, shift || '');
+    return Text::WikiFormat::format( $code , {},
+        { map { ( split /=/ ) } split ' ', $opts } );
 }
 
 1;
@@ -847,6 +860,9 @@ These are the methods that support the C<filter> format.
 
 C<Pod::POM::View::HTML::Filter> is shipped with a few built-in filters.
 
+The name for the filter is obtained by removing C<_filter> from the
+names listed below (except for C<default>):
+
 =over 4
 
 =item default
@@ -864,6 +880,9 @@ C<$Pod::POM::View::HTML::Filter::default>. This allows one to do:
     ) for Pod::POM::View::HTML::Filter->filters;
 
 and set all existing filters back to default.
+
+You can also use the C<delete()> method to remove a filter
+(from the instance or the class, depending on the way it's called).
 
 =item perl_tidy_filter
 
@@ -951,6 +970,21 @@ may not be what you expect.
 Here is a list of languages we have successfully tested with
 C<Syntax::Highlight::Engine::Kate> version 0.02:
 C<C>, C<Diff>, C<Fortran>, C<JavaScript>, C<LDIF>, C<SQL>.
+
+=item wiki_filter
+
+This filter converts the wiki format parsed by C<Text::WikiFormat>
+in HTML.
+
+The supported options are: C<prefix>, C<extended>, C<implicit_links>,
+C<absolute_links>. The option and value are separated by a C<=> character,
+as in the example below:
+
+    =begin filter wiki extended=1
+
+    [link|title]
+
+    =end
 
 =back
 
