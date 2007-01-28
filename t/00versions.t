@@ -1,17 +1,17 @@
 use Test::More tests => 1;
+use strict;
+use warnings;
 
 diag "Printing versions of relevant modules";
 
-for my $module ( qw(
-    Test::More
-    Pod::POM
-    PPI
-    PPI::HTML
-    Perl::Tidy
-    Syntax::Highlight::HTML
-    Syntax::Highlight::Shell
-    Syntax::Highlight::Engine::Kate
-) ) {
+# compute the list of prerequisites
+use Pod::POM::View::HTML::Filter;
+my %modules;
+$modules{$_}++
+    for map { @{ $_->{requires} || [] } }
+    values %Pod::POM::View::HTML::Filter::builtin;
+
+for my $module ( keys %modules ) {
     eval "require $module;";
     diag $@ ? "$module not installed"
             : "$module " . UNIVERSAL::VERSION($module);
