@@ -597,7 +597,7 @@ the filters.
 If any filter in the stack is defined as C<verbatim>, or if C<Pod::POM>
 detect any block in the C<=begin> / C<=end> block as verbatim, then
 the output will be produced between C<< <pre> >> and C<< </pre> >> tags.
-Otherwise, C<< <p> >> and C<< </p> >> tags will be used.
+Otherwise, no special tags will be added (his is left to the formatter).
 
 =head2 Examples
 
