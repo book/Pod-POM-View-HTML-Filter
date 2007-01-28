@@ -1,10 +1,14 @@
 Revision history for Pod-POM-View-HTML-Filter
 
-0.09
+0.09 Sun Jan 28 11:29:28 CET 2007
         [ENHANCEMENTS]
         - added support for aliases: perl is an alias perl_tidy,
           and ppi is an alias for perl_ppi
-        - add support for wiki format thanks to chromatic's Text::WikiFormat
+        - added support for wiki format thanks to chromatic's Text::WikiFormat
+        - added support for mediawiki format thanks to Derek Price's
+          Text::MediawikiFormat
+        [CHANGED BEHAVIOUR]
+        - non verbatim filters do not add <p></p> tags any more
 
 0.08 Thu Jan 25 23:53:59 CET 2007
         [ENHANCEMENTS]
