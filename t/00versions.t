@@ -11,7 +11,7 @@ $modules{$_}++
     for map { @{ $_->{requires} || [] } }
     values %Pod::POM::View::HTML::Filter::builtin;
 
-for my $module ( keys %modules ) {
+for my $module ( sort keys %modules ) {
     eval "require $module;";
     diag $@ ? "$module not installed"
             : "$module " . UNIVERSAL::VERSION($module);
